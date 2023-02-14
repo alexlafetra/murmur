@@ -11,7 +11,7 @@
  
  To run murmur without downloading the IDE, dm me! Unfortunately, bundled with Java, the app is too large to host on Github. It's free (of course), so if you're interested and don't have any experience using Processing/just want a standalone app drop me a line and I'll send you a link to a packaged application. If enough people want a copy, I'll definitely look into hosting it on dropbox.
  
- You can email me at alexlafetrathompson@gmail.com or message me on instagram @alexlafetra. 
+ You can email me at alexlafetrathompson@gmail.com or message me on instagram [@alexlafetra](https://www.instagram.com/alexlafetra/). 
  
  ## Controls
  The murmuration is attracted to a radius surrounding your cursor. Moving it around the screen will instigate the flock to chase you down to maintain a certain distance from your mouse cursor.
@@ -33,7 +33,7 @@
  - distance from cursor --> grain size
  - speed --> gain
  - distance from cursor --> noise
- - L/R position --> temporal direction (fwd/rev)
+ - L/R velocity --> temporal direction (fwd/rev)
 
  ![An image of murmur's controls](/resources/images/img4.png)
 
