@@ -1,7 +1,8 @@
-![An image of murmur in-action](/resources/images/img1_header.png)
+
 # murmur
- 
  Murmur is a digital instrument built around collective flocking behavior and granular synthesis. 
+ 
+ ![An image of murmur in-action](/resources/images/img1_header.png)
  
  Murmur is being written in Java and is built using [Processing](https://processing.org/) (which I literally cannot recommend enough). It uses the [Beads](http://www.beadsproject.net/) library to work with audio files and to mess with granular audio synthesis.
  
@@ -12,6 +13,10 @@
  To run murmur without downloading the IDE, dm me! Unfortunately, bundled with Java, the app is too large to host on Github. It's free (of course), so if you're interested and don't have any experience using Processing/just want a standalone app drop me a line and I'll send you a link to a packaged application. If enough people want a copy, I'll definitely look into hosting it on dropbox.
  
  You can email me at alexlafetrathompson@gmail.com or message me on instagram @alexlafetra. 
+ 
+ ## Controls
+ 
+ The murmuration can be linked to 
  
  ## Tips
  Basically, experiment! Before you do, turn the volume down in the app and *to be safe* on any speakers your computer's attached to.
