@@ -1,4 +1,4 @@
-![An image of murmur in-action](assets/images/test.png)
+![An image of murmur in-action](assets/images/img1.png)
 # murmur
  
  Murmur is a digital instrument built around collective flocking behavior and granular synthesis. 
@@ -7,9 +7,13 @@
  
  # Instructions
  ## Processing
- To run murmur from within the [Processing IDE](https://processing.org/download) (again, you should get Processing!), download the "murmur" folder and run any of the .pde files inside of it.
- ## Tips
+ To run murmur from within the [Processing IDE](https://processing.org/download), download the "murmur" folder and open any of the .pde files inside of it.  Once you've opened the sketch in the IDE, you might need to download the Beads library using Processing's library loader before you can run it as a normal processing sketch.
  
+ To run murmur without downloading the IDE, dm me! Unfortunately, bundled with Java, the app is too large to host on Github. It's free (of course), so if you're interested and don't have any experience using Processing/just want a standalone app drop me a line and I'll send you a link to a packaged application.
+ 
+ You can email me at alexlafetrathompson@gmail.com or message me on instagram @alexlafetra. 
+ 
+ ## Tips
  Basically, experiment! Before you do, turn the volume down in the app and *to be safe* on any speakers your computer's attached to.
  
  Two tips that I think are helpful:
