@@ -15,8 +15,13 @@
  You can email me at alexlafetrathompson@gmail.com or message me on instagram @alexlafetra. 
  
  ## Controls
+ The murmuration is attracted to a radius surrounding your cursor. Moving it around the screen will instigate the flock to chase you down and keep a certain distance from your mouse cursor.
+  Murmur is controlled by the (admittedly confusing) buttons in the top right corner of the window, and your mouse. Buttons along the right edge of the screen connect the murmuration to murmur's granular sample engine, and buttons along the top affect the way the flock is visualized. Each button displays a tooltip telling you what parameter it controls.
+ 
+ Clicking anywhere on the screen "freezes" the flock simulation, and pressing any key shows/hides the button layout.
+ 
+ ### Audio engine
  ![An image of murmur's controls](/resources/images/img4.png)
- Murmur is controlled by the (admittedly confusing) buttons in the top right corner of the window. Buttons along the right edge of the screen connect the murmuration to murmur's granular sample engine. 
  Clicking each button toggle's the corresponding connection between the sampler and the murmuration:
  - pitch
  - pan
@@ -24,14 +29,20 @@
  - grain size
  - gain
  - noise
- - sample direction
+ - sample direction (FWD/REV)
 The last orange button, and the round red button, allow you to load and save recorded samples respectively. Murmur currently can load in .mp3 and .wav files, and records to .wav files by default.
 
-Buttons along the top of the screen control 
+### Murmuration
+Buttons along the top of the screen control murmur's visual appearance. From left to right, these buttons let you:
+- freeze redrawing, giving each bird a trail.
+- show the average position of the murmuration, colored by the average direction of all birds within it.
+- Show the orbit radius around the cursor.
+- Color each bird by its unique color, or by its velocity vector. Velocity by default, which *usually* helps visually highlight the subflocks within the group.
+- Toggle between a black and white background. Purely for visual effect.
  
  
  ## Tips
- Basically, experiment! Before you do, turn the volume down in the app and *to be safe* on any speakers your computer's attached to.
+ Basically, experiment! *Before you run murmur, just to be safe, please turn the volume down in the app and on any speakers your computer's attached to.*
  
  Two tips that I think are helpful:
  
