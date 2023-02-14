@@ -1,4 +1,4 @@
-![An image of murmur in-action](assets/images/img1.png)
+![An image of murmur in-action](/resources/images/img1.png)
 # murmur
  
  Murmur is a digital instrument built around collective flocking behavior and granular synthesis. 
