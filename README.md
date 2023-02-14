@@ -1,6 +1,6 @@
 
 # murmur
- Murmur is a digital instrument built around collective flocking behavior and granular synthesis. 
+ Murmur is a digital instrument built around collective flocking behavior and granular synthesis. With it, you can utilize a murmuration of simulated birds to synthesize and record sound. The engine currently supports .mp3 and .wav samples. 
  
  ![An image of murmur in-action](/resources/images/img1_header.png)
  
@@ -15,8 +15,20 @@
  You can email me at alexlafetrathompson@gmail.com or message me on instagram @alexlafetra. 
  
  ## Controls
+ ![An image of murmur's controls](/resources/images/img4.png)
+ Murmur is controlled by the (admittedly confusing) buttons in the top right corner of the window. Buttons along the right edge of the screen connect the murmuration to murmur's granular sample engine. 
+ Clicking each button toggle's the corresponding connection between the sampler and the murmuration:
+ - pitch
+ - pan
+ - grain rate
+ - grain size
+ - gain
+ - noise
+ - sample direction
+The last orange button, and the round red button, allow you to load and save recorded samples respectively. Murmur currently can load in .mp3 and .wav files, and records to .wav files by default.
+
+Buttons along the top of the screen control 
  
- The murmuration can be linked to 
  
  ## Tips
  Basically, experiment! Before you do, turn the volume down in the app and *to be safe* on any speakers your computer's attached to.
