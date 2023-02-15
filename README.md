@@ -1,9 +1,9 @@
 # murmur
- Murmur is a digital instrument built around collective flocking behavior, it gets its name from "murmuration" and the google definition for 'murmur:' 
+ Murmur is a digital instrument built around collective flocking behavior, it gets its name from "murmuration" and the google definition:
  
  "a soft, indistinct sound made by a person or group of people speaking quietly or at a distance."
  
-Inside murmur, a community of simulated birds continually updates the parameters of a granular sampler engine, synthesizing and recording sound from an audio sample that you feed it.
+Within murmur, a community of simulated birds continually update the parameters of a granular sampler engine, synthesizing and recording sound from an audio sample that you feed it.
  
  Murmur is being written in Java and is built using [Processing](https://processing.org/) (which I literally cannot recommend enough). It uses the [Beads](http://www.beadsproject.net/) library to work with audio files and to mess with granular audio synthesis.
  
