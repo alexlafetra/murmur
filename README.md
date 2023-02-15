@@ -1,5 +1,5 @@
 # murmur
- Murmur is a digital instrument built around collective flocking behavior, it gets its name from "murmuration" and the google definition for 'murmur' -- 
+ Murmur is a digital instrument built around collective flocking behavior, it gets its name from "murmuration" and the google definition for 'murmur:' 
  
  "a soft, indistinct sound made by a person or group of people speaking quietly or at a distance."
  
