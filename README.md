@@ -51,9 +51,5 @@ Buttons along the top of the screen control murmur's visual appearance. From lef
 - color each bird by its unique color, or by its velocity vector. Velocity by default, which *usually* helps visually highlight the subflocks within the group.
 - toggle between a black and white background, *_night mode baby_*.
  
- ![An image of murmur's controls](/resources/images/img2_header.png)
+ ![A Pretty Pic](/resources/images/img2_header.png)
  
- ### Screen Recording on Mac
- 
- If you want simultaneous audio and video from Murmur, and you have quicktime installed (which you probably do), simply 
-
