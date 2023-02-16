@@ -148,8 +148,8 @@ void makeButtons(){
   reset = new Button(width-50,10,40,40, color(255,50,50), false, "reset",1);
   ptch = new Button(width-50,60,40,40, color(255,233,28), pitch, "pitch",0);
   streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "pan",0);
-  grnRate = new Button(width-50,160,40,40, color(0,255,200), gRate, "grain Rate",0);
-  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "grain Size",0);
+  grnRate = new Button(width-50,160,40,40, color(0,255,200), gRate, "grain rate",0);
+  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "grain size",0);
   vol = new Button(width-50,260,40,40, color(200,55,100), gain, "gain",0);
   rndm = new Button(width-50,310,40,40, color(0,255,100), gRandom, "noise",0);
   rev = new Button(width-50,360,40,40, color(75,157,255), paused, "direction",0);
@@ -158,7 +158,7 @@ void makeButtons(){
   
   //display controls
   bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "swap background",1);
-  byHeading = new Button(width-150,10,40,40,color(100,200,255), colorByHeading, "color by orientation",1);
+  byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "color style",1);
   showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "show orbit point",1);
   showAvg = new Button(width-250,10,40,40,color(200,55,100), showAvgPos, "show average position",1);
   tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "show tails",1);
@@ -248,8 +248,9 @@ boolean checkButtons(){
     atLeastOne = true;
   }
   if(byHeading.isMousedOver()){
-    colorByHeading = !colorByHeading;
-    byHeading.state = colorByHeading;
+    colorStyle++;
+    colorStyle %= 4;
+    byHeading.c = color(255/3*colorStyle,200,200);
     atLeastOne = true;
   }
   if(showOrbit.isMousedOver()){

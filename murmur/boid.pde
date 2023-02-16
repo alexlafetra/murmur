@@ -164,20 +164,31 @@ class Boid{
   //drawing the boid
   void render(){
     noStroke();
-    if(colorByHeading){
-      color a = color(map(velocity.x,-maxSpeed,maxSpeed,0,255),map(velocity.y,-maxSpeed,maxSpeed,0,255),map(velocity.z,0,maxSpeed,-maxSpeed,255));
+    //color by c
+    if(colorStyle == 0){
       //color a = color(map(acceleration.x,0,maxForce,0,255),map(acceleration.y,0,maxForce,0,255),map(acceleration.z,0,maxForce,0,255));
-    //color a = color(map(position.x,0,width,0,255),map(position.y,0,height,0,255),map(position.z,0,zDepth,0,255));
-      fill(a);
-    }
-    else{
       fill(c);
     }
-    //fill(0);
+    //color by vel
+    else if(colorStyle == 1){
+      color a = color(map(velocity.x,-maxSpeed,maxSpeed,0,255),map(velocity.y,-maxSpeed,maxSpeed,0,255),map(velocity.z,0,maxSpeed,-maxSpeed,255));
+      fill(a);
+    }
+    //color b/w
+    else if(colorStyle == 2){
+      stroke(0);
+      strokeWeight(1);
+      fill(255);
+    }
+    //color by pos
+    else if(colorStyle == 3){
+      color a = color(map(position.x,0,width,0,255),map(position.y,0,height,0,255),map(position.z,0,zDepth,0,255));
+      fill(a);
+    }
     pushMatrix();
     translate(position.x,position.y,position.z);
     PVector temp = new PVector(velocity.x,velocity.y,velocity.z);
-    temp.mult(3);
+    temp.mult(4);
     beginShape(TRIANGLE_STRIP);
     vertex(-boidSize/2,0,0);
     vertex(boidSize/2,0,0);

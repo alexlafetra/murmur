@@ -12,6 +12,29 @@ Sample outputSample;
 RecordToSample recorder;
 GranularSamplePlayer player;
 
+//"glide" objects are like knobs!
+//as UGens, you can attach them to different bead objects and they'll
+//pass their value into it
+Glide grainRate;
+Glide grainSize;
+Glide samplePitch;
+Glide randomness;
+Panner pan;
+Glide panPos;
+Gain g;
+Gain masterGain;
+Glide gainGlide;
+//parameters that get updated by the flock
+PVector avgVel;
+//set play direction based on L/R of screen
+PVector avgPos;
+//these two are only updated by the flock loop, to save resources
+//this is a measure of the relative spatial spread
+float avgDiff_Position = 0;
+//need a measure of the spread in the headings
+float avgDiff_Heading = 0;
+
+
 void startRecording(){
   //default is a 1-min (60,000ms) stereo sample,
   outputSample = new Sample(60000);
@@ -33,7 +56,7 @@ void endRecording(){
   recorder.clip();
   //writing the sample
   try{
-    outputSample.write(sketchPath("recordings/") + "rec"+str(numberOfRecordings)+".wav");
+    outputSample.write(dataPath("recordings/rec"+str(numberOfRecordings)+".wav"));
     numberOfRecordings++;
   }
   catch(Exception e){
@@ -51,50 +74,37 @@ void loadSample(){
 void startplayer() {
    ac = new AudioContext();
    ac = AudioContext.getDefaultContext();
+   
    loadSample();
    //loop the sample at its end points
    player.setLoopType(SamplePlayer.LoopType.LOOP_ALTERNATING);
    
+   //glide controls
    grainRate = new Glide(ac,0,100);
    grainSize = new Glide(ac,1,100);
    samplePitch = new Glide(ac,1,100);
    randomness = new Glide(ac,0,1);
    pan = new Panner(ac);
-   g = new Gain(1, 0.1);
-   masterGain = new Gain(1,0.1);
+   gainGlide = new Glide(ac,0.1,10);
    
-   //control the rate of grain firing
+   //gain that's controlled by flock
+   g = new Gain(1, 0.1);
+   g.setGain(gainGlide);
+   //master gain, controlled by slider
+   masterGain = new Gain(1,0.1);
+   masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
+
+   //link controls to synth and link Beads together to form audio out
    player.setGrainInterval(grainRate);
    player.setGrainSize(grainSize);
    player.setRandomness(randomness);
    player.setPitch(samplePitch);
-   g.addInput(player);//grains feed into gain
-   pan.addInput(g);//gain feeds into pan
-   masterGain.addInput(g);
-   ac.out.addInput(masterGain);//pan feeds into ac
+   g.addInput(player);//grains feed into gain 'g'
+   pan.addInput(g);//g feeds into pan
+   masterGain.addInput(pan);//pan feeds into masterGain
+   ac.out.addInput(masterGain);//masterGain feeds into ac
    ac.start();
 }
-//"glide" objects are like knobs!
-//as UGens, you can attach them to different bead objects and they'll
-//pass their value into it
-Glide grainRate;
-Glide grainSize;
-Glide samplePitch;
-Glide randomness;
-Panner pan;
-Glide panPos;
-Gain g;
-Gain masterGain;
-//parameters that get updated by the flock
-PVector avgVel;
-//set play direction based on L/R of screen
-PVector avgPos;
-
-//these two are only updated by the flock loop, to save resources
-//this is a measure of the relative spatial spread
-float avgDiff_Position = 0;
-//need a measure of the spread in the headings
-float avgDiff_Heading = 0;
 
 //getting data from flock for music purposes
 void getData(){
@@ -148,15 +158,18 @@ void updateGrains(){
   }
   if(gRate){
     grainRate.setValue(vel/1000);
+    //grainRate.setValue(avgDiff_Position/500);
   }
   else{
     grainRate.setValue(0);
   }
   if(gain){
-    g.setGain(1-map(vel,-maxSpeed,maxSpeed,0,1));
+    gainGlide.setValue(1-map(vel,-maxSpeed,maxSpeed,0,1));
+    //g.setGain(1-map(vel,-maxSpeed,maxSpeed,0,1));
   }
   else{
-    g.setGain(0.1);
+    //g.setGain(0.1);
+    gainGlide.setValue(0.1);
   }
   if(stereo){
     pan.setPos(map(avgPos.x,-width,3*width/2,-1,1));
@@ -164,12 +177,4 @@ void updateGrains(){
   else{
     pan.setPos(0);
   }
-
-  //interesting
-  //if(PVector.dist(avgPos,orbitPoint)<orbitR){
-  //  grainRate.setValue(-100/avgVel.mag());
-  //}
-  //else{
-  //  grainRate.setValue(100/avgVel.mag());
-  //}
 }

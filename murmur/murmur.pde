@@ -1,3 +1,4 @@
+import drop.*;
 /*
 a few beads tricks:
 it's helpful to give the 'glide' objects a long interpolation time, in
@@ -5,9 +6,9 @@ general it sounds less choppy and looks like it sways with the shape of the floc
 */
 
 //initial audio file vv
-//String filename = "test1_sdc.mp3";
+String filename = "test1_sdc.mp3";
 //String filename = "test2_q.mp3";
-String filename = "test3_chopin.mp3";
+//String filename = "test3_chopin.mp3";
 
 //parameters for the flock sim
 
@@ -35,7 +36,7 @@ float floorHeight = 800;
 
 //display controls
 boolean paused = true;
-boolean colorByHeading = true;
+int colorStyle = 1;
 boolean showOrbitPoint = false;
 boolean showAvgPos = false;
 boolean blackOrWhite_bg = false;
@@ -52,14 +53,19 @@ boolean gSize = true;
 boolean gain = true;
 boolean gRandom = true;
 boolean reverse = true;
+
+boolean secondWindowOpen = false;
+ChildApplet childWindow;
+
 //array of boids (holding all the boids)
 Boid[] flock;
 
 void setup(){
+  size(1000,1000,P3D);
+  background(0);
+  //drop = new SDrop(this);
+  filename = dataPath("samples/"+filename);
   numberOfRecordings = countRecordings();
-  //PFont font;
-  //font = createFont("LetterGothicStd.otf",128);
-  //textFont(font,128);
   avgVel = new PVector(0,0,0);
   avgPos = new PVector(0,0,0);
   //allocate memory for the flock
@@ -70,22 +76,15 @@ void setup(){
   }
   makeButtons();
   makeSliders();
-  size(1000,1000,P3D);
-  background(0);
-  String path = sketchPath("samples/");
-  filename = path+filename;
+
   startplayer();
   //just so the orb starts w/ the boids
   getData();
-  masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
 }
-
 //counts the recordings in the "recordings" folder
 int countRecordings(){
-  File f = dataFile(sketchPath("recordings/"));
-  println(f.list().length);
+  File f = dataFile("recordings");
   return f.list().length;
-  //return 0;
 }
 void drawPause(){
   int x = width/2;
@@ -146,11 +145,12 @@ void getNewSample(){
   player.kill();
   selectInput("feed me an mp3 file!", "loadFile");
 }
+
 void loadFile(File selectedFile){
   if(selectedFile != null){
     String name = selectedFile.getAbsolutePath();
     //load in file path, if it's an mp3
-    if(name.endsWith(".mp3") || name.endsWith(".wav")){
+    if(isValidAudioFileType(name)){
       filename = selectedFile.getAbsolutePath();
     }
   }
@@ -158,7 +158,36 @@ void loadFile(File selectedFile){
   startplayer();
   loadSample.state = true;
 }
+boolean isValidAudioFileType(String s){
+  if(s.endsWith(".mp3")|s.endsWith(".wav")){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+//getting x/y coord of screen
+PVector getLocationOnScreen(){
+  PVector location = new PVector();
+  com.jogamp.newt.opengl.GLWindow window = (com.jogamp.newt.opengl.GLWindow)(((PSurfaceJOGL)surface).getNative());
+  com.jogamp.nativewindow.util.Point point = window.getLocationOnScreen(new com.jogamp.nativewindow.util.Point());
+  location.set(point.getX(),point.getY());
+  return location;
+}
+
 void draw(){
+  //NEEDS to be initialized within draw!
+  /*
+  not sure why. running multiple PApplets with different renderers is really buggy,
+  my guess is it has something to do with when "settings" is run.
+  initializing the object here seems to force all the 'setup' for the main applet to take place first,
+  THEN canvas() the second one
+  */
+  if(!secondWindowOpen){
+    PVector loc = getLocationOnScreen();
+    childWindow = new ChildApplet(loc.x+1000,loc.y-53);
+    secondWindowOpen = true;
+  }
   updateOrbitPoint();
   //clear background
   if(!showTails){
@@ -189,9 +218,8 @@ void draw(){
   drawAvgData();
    
   noFill();
-  stroke(255);
+  stroke(255);  
   cursor(ARROW);
-  
   //if the controls are being shown
   if(showingControls){
     displayButtons();
@@ -207,7 +235,6 @@ void draw(){
       displaySliders();
       buttonOffset+=5;
     }
-    //noCursor();
   }
 }
 
@@ -235,6 +262,26 @@ void mouseReleased(){
   releaseSliders();
 }
 void keyPressed(){
-  background(0);
-  showingControls = !showingControls;
+  if(key == 'c'){
+    background(0);
+  }
+  //pause on space
+  else if(key == ' '){
+    paused = !paused;
+  }
+  else{
+    showingControls = !showingControls;
+  }
+}
+String getFormattedFileName(){
+  String text = "";
+  //step back thru string until you find a "/"
+  for(int i = filename.length()-1; i>=0; i--){
+    if(filename.charAt(i) == '/'){
+      text = filename.substring(i+1);
+      return text;
+    }
+  }
+  text = "Feed me an MP3/WAV pls";
+  return text;
 }
