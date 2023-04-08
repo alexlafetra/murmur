@@ -83,11 +83,19 @@ class Button{
     else{
       strokeWeight(7);
       //if it's not pressed, or if it is and it's been 500 frames
-      if(state || (frameCount%60)>30){
-        fill(c);
+      if(type == 4){
+        if(state || (frameCount%60)>30){
+          fill(c);
+        }
+        else{
+          fill(0,0,0,0);
+        }
       }
       else{
-        fill(0,0,0,0);
+        if(state)
+          fill(c);
+        else
+          fill(0,0,0,0);
       }
       if(type == 3){
         if(isMousedOver()){
@@ -151,6 +159,10 @@ Button rec;
 Button tails;
 Button resetParams;
 Button randomizeParams;
+
+Button updatePhysicsInGroups;
+Button avgGroupData;
+
 Button[] buttons;
 
 void makeButtons(){
@@ -163,7 +175,7 @@ void makeButtons(){
   rndm = new Button(width-50,310,40,40, color(0,255,100), gRandom, "noise",0);
   rev = new Button(width-50,360,40,40, color(75,157,255), paused, "direction",0);
   loadSample = new Button(width-50,410,40,40,color(255,150,50), true, "load new sample",0);
-  rec = new Button(width-50,460,40,40, color(222,22,29), paused, "record",2);
+  rec = new Button(width-50,460,40,40, color(222,22,29), paused, "record",4);
   
   //display controls
   bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "swap background",1);
@@ -176,8 +188,11 @@ void makeButtons(){
   resetParams = new Button(20,400,40,40, color(255,250,50), true, "reset",3);
   randomizeParams = new Button(20,460,40,40, color(50,250,255), true, "randomize",3);
   
+  avgGroupData= new Button(20,660,40,40, color(255,100,255), averageGroupData, "Average Group Data",3);
+  updatePhysicsInGroups = new Button(20,720,40,40, color(255,150,0),updateWithinGroups, "Update Groups Only",3);
+  
   //putting all the buttons into an array
-  buttons = new Button[17];
+  buttons = new Button[19];
   buttons[0] = reset;
   buttons[1] = ptch;
   buttons[2] = streo;
@@ -195,6 +210,8 @@ void makeButtons(){
   buttons[14] = tails;
   buttons[15] = resetParams;
   buttons[16] = randomizeParams;
+  buttons[17] = avgGroupData;
+  buttons[18] = updatePhysicsInGroups;
 }
 
 //resets the flock parameters
@@ -324,6 +341,16 @@ boolean checkButtons(){
   }
   if(randomizeParams.isMousedOver()){
     randomizeSliders();
+    atLeastOne = true;
+  }
+  if(avgGroupData.isMousedOver()){
+    averageGroupData = !averageGroupData;
+    avgGroupData.state = averageGroupData;
+    atLeastOne = true;
+  }
+  if(updatePhysicsInGroups.isMousedOver()){
+    updateWithinGroups = !updateWithinGroups;
+    updatePhysicsInGroups.state = updateWithinGroups;
     atLeastOne = true;
   }
   return atLeastOne;

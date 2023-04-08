@@ -127,7 +127,6 @@ class Boid{
   }
 
   void updatePhysics(Boid[] boids){
-    avgDiff_Position = 0;
     //force that steers boids to face the same heading as 'nearby' boids
     PVector avgOrientation = new PVector(0,0,0);
     //force that steers boids to the avg location of nearby boids
@@ -152,7 +151,7 @@ class Boid{
         total++;
       }
     }
-    avgDiff_Position+=avgDist/numberOfBoids;
+    avgDiff_Position+=avgDist;
     if(total>0){
       //divide to get the average orientation
       avgOrientation.div(total);

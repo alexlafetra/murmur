@@ -204,7 +204,107 @@ PVector getLocationOnScreen(){
   return location;
 }
 
+//stores a group of boids at a certain heading and location
+class Group{
+  PVector heading;
+  PVector location;
+  ArrayList<Boid> homies;
+  color c;
+  public Group(Boid b){
+    heading = b.velocity;
+    location = b.position;
+    homies = new ArrayList<Boid>();
+    homies.add(b);
+    c = b.c;
+    //c = color(map(b.velocity.x,-maxSpeed,maxSpeed,0,255),map(b.velocity.y,-maxSpeed,maxSpeed,0,255),map(b.velocity.z,0,maxSpeed,-maxSpeed,255));
+  }
+}
+
+float headingTolerance = 10;
+int positionTolerance = 100;
+ArrayList<Group>groups;
+boolean averageGroupData = false;
+boolean updateWithinGroups = false;
+
+void updateGroups(){
+  groups = new ArrayList<Group>();
+  Group firstGroup = new Group(flock[0]);
+  groups.add(firstGroup);
+  //println("making groups...");
+  for(int i = 1; i<flock.length; i++){
+    boolean foundGroup = false;
+    for(int j = 0; j<groups.size(); j++){
+      PVector differenceInPos = PVector.sub(flock[i].position,groups.get(j).location);
+      float differenceInHeading = PVector.angleBetween(flock[i].velocity,groups.get(j).heading);
+      //if the boid is in the group, add it
+      if(differenceInPos.mag() < positionTolerance && abs(differenceInHeading)<headingTolerance){
+        //add boid
+        groups.get(j).homies.add(flock[i]);
+        
+        if(averageGroupData){
+        //average the group position
+          groups.get(j).location = PVector.add(flock[i].position,groups.get(j).location);
+          groups.get(j).location.div(2);
+        //average the group heading
+          groups.get(j).heading= PVector.add(flock[i].velocity,groups.get(j).heading);
+          groups.get(j).heading.div(2);
+        }
+        foundGroup = true;
+        break;
+      }
+    }
+    //if the bird doesn't fit in to any of the groups, make a new group with the boid in it and add it to the list
+    if(!foundGroup){
+      //println("making new group");
+      Group newGroup = new Group(flock[i]);
+      groups.add(newGroup);
+    }
+  }
+  //println("number of groups:" + str(groups.size()));
+  //go thru each group and update the boids in it
+  float tempDiff = 0;
+  for(int i = 0; i<groups.size(); i++){
+    if(updateWithinGroups){
+      avgDiff_Position = 0;
+      updatePhysicsOfGroup(groups.get(i));
+      avgDiff_Position/=groups.get(i).homies.size();
+      tempDiff += avgDiff_Position;
+    }
+    //println(groups.get(i).homies.size());
+      
+    //drawing a group if it's more than just one boid
+    //if(groups.get(i).homies.size()>1)
+    drawSubGroups(groups.get(i));
+  }
+  avgDiff_Position = (tempDiff/groups.size());
+  //println(avgDiff_Position);
+}
+
+void updatePhysicsOfGroup(Group g){
+  for(int i = 0; i<g.homies.size(); i++){
+    Boid[] tempArray = new Boid[g.homies.size()];
+    tempArray = g.homies.toArray(tempArray);
+    g.homies.get(i).updatePhysics(tempArray);
+  }
+}
+
+void drawSubGroups(Group g){
+  //color groupColor = color(random(0,255),random(0,255),random(0,255));
+  for(int i = 0; i<g.homies.size(); i++){
+    color tempC = g.homies.get(i).c;
+    g.homies.get(i).c = g.c;
+    g.homies.get(i).render();
+    g.homies.get(i).c = tempC;
+  }
+  //fill(g.c);
+  stroke(g.c);
+  noFill();
+  if(g.homies.size()>1)
+    ellipse(g.location.x,g.location.y,g.homies.size(),g.homies.size());
+}
+
 void draw(){
+  //println(avgDiff_Position);
   //NEEDS to be initialized within draw!
   /*
   not sure why. running multiple PApplets with different renderers is really buggy,
@@ -228,19 +328,28 @@ void draw(){
     else
       background(255);
   }
-  Boid[] buffer = flock;
+  if(updateWithinGroups)
+    updateGroups();
+  //Boid[] buffer = flock;
   //drawBounds();
   for(int i = 0; i<flock.length; i++){
     if(!paused){
       //updating physics of each boid
-      buffer[i].updatePhysics(flock);
+      //buffer[i].updatePhysics(flock);
+      if(!updateWithinGroups){
+        avgDiff_Position = 0;
+        flock[i].updatePhysics(flock);
+        avgDiff_Position/=flock.length;
+      }
       //updating location of each boid
-      buffer[i].updateLocation();
+      flock[i].updateLocation();
     }
     //drawing each boid
-    buffer[i].render();
+    if(!updateWithinGroups)
+      flock[i].render();
+    //buffer[i].render();
   }
-  flock = buffer;
+  //flock = buffer;
   if(!paused){
     updateGrains();
   }

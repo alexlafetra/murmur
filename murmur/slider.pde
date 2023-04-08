@@ -134,6 +134,10 @@ Slider orientationSlider;
 Slider randomSlider;
 Slider orbitSlider;
 Slider perceptionSlider;
+
+Slider groupPositionToleranceSlider;
+Slider groupHeadingToleranceSlider;
+
 Slider[] sliders;
 void makeSliders(){
   volumeSlider = new Slider(width-30,890,30,200,0,2,1,"Volume",0);
@@ -162,7 +166,10 @@ void makeSliders(){
   orbitSlider = new Slider(70,290,30,100,1,500,500-300,"Orbit",-1);
   perceptionSlider = new Slider(70,350,30,100,0,200,200-50,"Perception",-1);
   
-  sliders = new Slider[7];
+  groupPositionToleranceSlider = new Slider(70,550,30,100,0,1000,1000-100,"Position Tolerance",-1);
+  groupHeadingToleranceSlider = new Slider(70,610,30,100,0,360,0,"Heading Tolerance",-1);
+  
+  sliders = new Slider[9];
   sliders[0] = volumeSlider;
   sliders[1] = avoidanceSlider;
   sliders[2] = cohesionSlider;
@@ -170,6 +177,8 @@ void makeSliders(){
   sliders[4] = randomSlider;
   sliders[5] = orbitSlider;
   sliders[6] = perceptionSlider;
+  sliders[7] = groupPositionToleranceSlider;
+  sliders[8] = groupHeadingToleranceSlider;
 }
 void displaySliders(){
   for(int i = 0; i<sliders.length; i++){
@@ -207,6 +216,8 @@ void moveSliders(){
   randomModifier = randomSlider.max-randomSlider.currentVal;
   orbitR = orbitSlider.max - orbitSlider.currentVal;
   perceptionR = perceptionSlider.max - perceptionSlider.currentVal;
+  positionTolerance = int(groupPositionToleranceSlider.max - groupPositionToleranceSlider.currentVal);
+  headingTolerance = radians(groupHeadingToleranceSlider.max - groupHeadingToleranceSlider.currentVal);
 }
 
 void releaseSliders(){
