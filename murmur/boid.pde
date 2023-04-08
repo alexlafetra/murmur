@@ -8,6 +8,7 @@ float boidSize = 10;
 //limit on forces
 float maxForce = 0.5;
 float maxSpeed = 10;
+
 class Boid{
   //data for position, vel, and acceleration
   PVector position;
@@ -57,18 +58,45 @@ class Boid{
     if(d<0){
       //if it can 'see' the floor
       //if(abs(d)<perceptionR){
-        floorF = PVector.sub(floorLocation,position);
-        floorF.mult(1/pow(d,2));
-        floorF.limit(maxForce);
+        //floorF = PVector.sub(floorLocation,position);
+        //floorF.mult(1/pow(d,2));
+        //floorF.limit(maxForce);
       //}
     }
     //if you're below the floor
     else{
-        floorF = PVector.sub(floorLocation,position);
+      floorF = PVector.sub(floorLocation,position);
       floorF.mult(d);
       floorF.limit(maxForce);
     }
     return floorF;
+  }
+  PVector wallForce(){
+    PVector wallF = new PVector(0,0,0);
+    PVector floorF = new PVector(0,0,0);
+    PVector frontF = new PVector(0,0,0);
+    if(position.x>rightWall){
+      wallF = new PVector(rightWall-position.x,0,0);
+    }
+    else if(position.x<leftWall){
+      wallF = new PVector(leftWall-position.x,0,0);
+    }
+    if(position.y<ceiling){
+      floorF = new PVector(0,ceiling-position.y,0);
+    }
+    else if(position.y>floor){
+      floorF = new PVector(0,floor-position.y,0);
+    }
+    if(position.z<backWall){
+      frontF = new PVector(0,0,backWall-position.z);
+    }
+    else if(position.z>frontWall){
+      frontF = new PVector(0,0,frontWall-position.z);
+    }
+    wallF.add(floorF);
+    wallF.add(frontF);
+    wallF.limit(maxForce);
+    return wallF;
   }
   
   //force that should simulate the way it's more efficient to travel perpendicular to gravity
@@ -156,8 +184,12 @@ class Boid{
     force.add(avgLocation.mult(cohesionModifier));
     force.add(avoidance.mult(avoidanceModifier));
     force.add(randomForce(maxForce).mult(randomModifier));
-    force.add(orbit().mult(orbitModifier));
-    force.add(floorForce());
+     
+    //flock is either constrained by walls, or attracted to the cursor
+    if(walls)
+      force.add(wallForce());
+    else
+      force.add(orbit().mult(orbitModifier));
     acceleration = force;
   }
 

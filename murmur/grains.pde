@@ -11,6 +11,7 @@ int numberOfRecordings = 0;
 Sample outputSample;
 RecordToSample recorder;
 GranularSamplePlayer player;
+Reverb reverb;
 
 //"glide" objects are like knobs!
 //as UGens, you can attach them to different bead objects and they'll
@@ -24,6 +25,8 @@ Glide panPos;
 Gain g;
 Gain masterGain;
 Glide gainGlide;
+Glide reverbSize;
+
 //parameters that get updated by the flock
 PVector avgVel;
 //set play direction based on L/R of screen
@@ -33,7 +36,7 @@ PVector avgPos;
 float avgDiff_Position = 0;
 //need a measure of the spread in the headings
 float avgDiff_Heading = 0;
-
+float headingVariance;
 
 void startRecording(){
   //default is a 1-min (60,000ms) stereo sample,
@@ -81,11 +84,14 @@ void startplayer() {
    
    //glide controls
    grainRate = new Glide(ac,0,100);
-   grainSize = new Glide(ac,1,100);
+   grainSize = new Glide(ac,0.1,100);
    samplePitch = new Glide(ac,1,100);
    randomness = new Glide(ac,0,1);
    pan = new Panner(ac);
    gainGlide = new Glide(ac,0.1,10);
+   
+   reverb = new Reverb(ac,2);
+   reverb.setSize(1);
    
    //gain that's controlled by flock
    g = new Gain(1, 0.1);
@@ -99,8 +105,9 @@ void startplayer() {
    player.setGrainSize(grainSize);
    player.setRandomness(randomness);
    player.setPitch(samplePitch);
-   g.addInput(player);//grains feed into gain 'g'
-   pan.addInput(g);//g feeds into pan
+   g.addInput(player);//player feeds into g
+   pan.addInput(g);//g feed into pan
+   reverb.addInput(pan);//pan feeds into reverb
    masterGain.addInput(pan);//pan feeds into masterGain
    ac.out.addInput(masterGain);//masterGain feeds into ac
    ac.start();
@@ -108,6 +115,7 @@ void startplayer() {
 
 //getting data from flock for music purposes
 void getData(){
+  //getting the avg vel and the avg position
   avgVel = new PVector(0,0,0);
   avgPos = new PVector(0,0,0);
   for(int i = 0; i<flock.length; i++){
@@ -116,6 +124,16 @@ void getData(){
   }
   avgPos.div(flock.length);
   avgVel.div(flock.length);
+  
+  //getting variances
+  PVector headingVar = new PVector(0,0,0);
+  for(int i = 0; i<flock.length; i++){
+    headingVar.x += sq(flock[i].velocity.x - avgVel.x);
+    headingVar.y += sq(flock[i].velocity.x - avgVel.x);
+    headingVar.z += sq(flock[i].velocity.x - avgVel.x);
+  }
+  headingVar.div(flock.length);
+  headingVariance = headingVar.mag();
 }
 void updateGrains(){
   if(!paused){
@@ -139,32 +157,40 @@ void updateGrains(){
 
   //blurs out sample when birds get farther away
   if(gRandom){
-    randomness.setValue(distanceToOrbit/10000);
+    //randomness.setValue(distanceToOrbit/10000);
+    randomness.setValue(headingVariance/300);
   }
   else{
     randomness.setValue(0);
   }
-  if(gSize){
-    grainSize.setValue(distanceToOrbit/1000);
-  }
-  else{
-    grainSize.setValue(1);
-  }
   if(pitch){
     samplePitch.setValue(avgDiff_Position*10);
+    //samplePitch.setValue(headingVariance*100);
   }
   else{
     samplePitch.setValue(1);
   }
+  if(gSize){
+    //grainSize.setValue(distanceToOrbit/1000);
+    //println(distanceToOrbit/1000);
+    //grainSize.setValue(avgDiff_Position/1000);
+    //grainSize.setValue(map(headingVariance,0,40,0.01,0.9));
+    grainSize.setValue(map(headingVariance,0,40,0,1));
+  }
+  else{
+    grainSize.setValue(0.1);
+  }
   if(gRate){
-    grainRate.setValue(vel/1000);
+    //grainRate.setValue(vel/1000);
+    grainRate.setValue(1/map(headingVariance,0,60,0,10));
+    //grainRate.setValue(10/pow(headingVariance,3));
     //grainRate.setValue(avgDiff_Position/500);
   }
   else{
     grainRate.setValue(0);
   }
   if(gain){
-    gainGlide.setValue(1-map(vel,-maxSpeed,maxSpeed,0,1));
+    gainGlide.setValue(map(vel,-maxSpeed/2,maxSpeed,0,0.1));
     //g.setGain(1-map(vel,-maxSpeed,maxSpeed,0,1));
   }
   else{

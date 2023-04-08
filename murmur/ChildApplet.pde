@@ -19,10 +19,10 @@ class ChildApplet extends PApplet{
     windowMove(int(this.x),int(this.y));
     tint = 400;
     drop = new SDrop(this);
+    this.textSize(40);
+    this.textAlign(CENTER);
   }
-  public void draw() {
-    //background(frameCount%400,tint,tint);
-    windowTitle(getFormattedFileName());
+  public void drawSound(){
     this.loadPixels();
     //set the background
     Arrays.fill(this.pixels, color(frameCount%400,tint,tint));
@@ -39,6 +39,14 @@ class ChildApplet extends PApplet{
       this.pixels[index] = color(400-frameCount%400,600-tint,600-tint);
     }
     this.updatePixels();
+  }
+  public void draw() {
+    //background(frameCount%400,tint,tint);
+    windowTitle(getFormattedFileName());
+    drawSound();
+    if(buttonText != null){
+      this.text(buttonText,this.width/2,this.height/2);
+    }
   }
   //when a file is dropped on the window
   public void dropEvent(DropEvent theEvent) {

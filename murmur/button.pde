@@ -35,6 +35,7 @@ class Button{
   Boolean isMousedOver(){
     if(mouseX>=x && mouseX<= x+w && mouseY>=y && mouseY<=y+h){
       cursor(HAND);
+      buttonText = txt;
       return true;
     }
     else{
@@ -88,17 +89,21 @@ class Button{
       else{
         fill(0,0,0,0);
       }
-      if(isMousedOver()){
-        ellipse(w/2+buttonOffset,h/2,w+4,h+4);
+      if(type == 3){
+        if(isMousedOver()){
+          ellipse(w/2-buttonOffset,h/2,w+4,h+4);
+        }
+        else{
+          ellipse(w/2-buttonOffset,h/2,w,h);
+        }
       }
       else{
-        ellipse(w/2+buttonOffset,h/2,w,h);
-      }
-      if(state){
-        txt = "stop recording";
-      }
-      else{
-        txt = "start recording";
+        if(isMousedOver()){
+          ellipse(w/2+buttonOffset,h/2,w+4,h+4);
+        }
+        else{
+          ellipse(w/2+buttonOffset,h/2,w,h);
+        }
       }
     }
     popMatrix();
@@ -114,7 +119,7 @@ class Button{
         }
       }
       pushMatrix();
-      textSize(25);
+      //textSize(25);
       //side buttons
       if(type != 1){
         translate(x+12,510);
@@ -122,9 +127,9 @@ class Button{
       }
       //top buttons
       else{
-        translate(width-320-textWidth(txt),y+40-12);
+        translate(width-320-textWidth(txt),38);
       }
-      text(txt,0,0);
+      //text(txt,0,0);
       popMatrix();
     }
   }
@@ -144,6 +149,10 @@ Button showAvg;
 Button loadSample;
 Button rec;
 Button tails;
+Button resetParams;
+Button randomizeParams;
+Button[] buttons;
+
 void makeButtons(){
   reset = new Button(width-50,10,40,40, color(255,50,50), false, "reset",1);
   ptch = new Button(width-50,60,40,40, color(255,233,28), pitch, "pitch",0);
@@ -159,11 +168,46 @@ void makeButtons(){
   //display controls
   bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "swap background",1);
   byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "color style",1);
-  showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "show orbit point",1);
+  showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "enable walls",1);
   showAvg = new Button(width-250,10,40,40,color(200,55,100), showAvgPos, "show average position",1);
   tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "show tails",1);
 
+  //buttons for flock parameters
+  resetParams = new Button(20,400,40,40, color(255,250,50), true, "reset",3);
+  randomizeParams = new Button(20,460,40,40, color(50,250,255), true, "randomize",3);
+  
+  //putting all the buttons into an array
+  buttons = new Button[17];
+  buttons[0] = reset;
+  buttons[1] = ptch;
+  buttons[2] = streo;
+  buttons[3] = grnRate;
+  buttons[4] = grnSize;
+  buttons[5] = vol;
+  buttons[6] = rndm;
+  buttons[7] = rev;
+  buttons[8] = loadSample;
+  buttons[9] = rec;
+  buttons[10] = bg;
+  buttons[11] = byHeading;
+  buttons[12] = showOrbit;
+  buttons[13] = showAvg;
+  buttons[14] = tails;
+  buttons[15] = resetParams;
+  buttons[16] = randomizeParams;
 }
+
+//resets the flock parameters
+void resetParameters(){
+  avoidanceModifier = 1.5;
+  cohesionModifier = 1.1;
+  orientationModifier = 1.2;
+  randomModifier = 1;
+  perceptionR = 50;
+  orbitR = 300;
+  makeSliders();
+}
+
 void reset(){
   player.kill();
   paused = true;
@@ -176,7 +220,7 @@ void reset(){
     flock[i] = new Boid();
   }
   makeButtons();
-  makeSliders();
+  //makeSliders();
   background(0);
   startplayer();
   //just so the orb starts w/ the boids
@@ -185,21 +229,9 @@ void reset(){
 }
 
 void displayButtons(){
-  ptch.display();
-  streo.display();
-  grnRate.display();
-  grnSize.display();
-  vol.display();
-  rndm.display();
-  rev.display();
-  reset.display();
-  bg.display();
-  byHeading.display();
-  showAvg.display();
-  showOrbit.display();
-  loadSample.display();
-  rec.display();
-  tails.display();
+  for(int i = 0; i<buttons.length; i++){
+    buttons[i].display();
+  }
 }
 boolean checkButtons(){
   boolean atLeastOne = false;
@@ -254,8 +286,8 @@ boolean checkButtons(){
     atLeastOne = true;
   }
   if(showOrbit.isMousedOver()){
-    showOrbitPoint = !showOrbitPoint;
-    showOrbit.state = showOrbitPoint;
+    walls = !walls;
+    showOrbit.state = walls;
     atLeastOne = true;
   }
   if(showAvg.isMousedOver()){
@@ -271,7 +303,7 @@ boolean checkButtons(){
   if(tails.isMousedOver()){
     showTails = !showTails;
     tails.state = showTails;
-    showingControls = !showTails;
+    //showingControls = !showTails;
     atLeastOne = true;
   }
   if(rec.isMousedOver()){
@@ -284,6 +316,14 @@ boolean checkButtons(){
       recStarted = true;
     }
     rec.state = !recStarted;
+    atLeastOne = true;
+  }
+  if(resetParams.isMousedOver()){
+    resetParameters();
+    atLeastOne = true;
+  }
+  if(randomizeParams.isMousedOver()){
+    randomizeSliders();
     atLeastOne = true;
   }
   return atLeastOne;

@@ -6,10 +6,10 @@ general it sounds less choppy and looks like it sways with the shape of the floc
 */
 
 //initial audio file vv
-String filename = "test1_sdc.mp3";
-//String filename = "test2_q.mp3";
+//String filename = "test1_sdc.mp3";
+String filename = "test2_q.mp3";
 //String filename = "test3_chopin.mp3";
-
+String buttonText;
 //parameters for the flock sim
 
 //number of birds
@@ -17,7 +17,9 @@ int numberOfBoids = 1500;
 //avoidance weight
 float avoidanceModifier = 1.5;
 //attraction/cohesion weight
+//float cohesionModifier = 1.1;
 float cohesionModifier = 1.1;
+
 //orientation/alignment weight
 float orientationModifier = 1.2;
 //random force weight
@@ -32,22 +34,30 @@ float perceptionR = 50;
 float orbitR = 300;
 
 //floor that the birds are repelled from
-float floorHeight = 800;
+float floorHeight = 800;//DEPRECATED
+
+int rightWall = 900;
+int leftWall = 100;
+int floor = 900;
+int ceiling = 100;
+int frontWall = 50;
+int backWall = -1000;
 
 //display controls
 boolean paused = true;
 int colorStyle = 1;
 boolean showOrbitPoint = false;
 boolean showAvgPos = false;
-boolean blackOrWhite_bg = false;
+boolean blackOrWhite_bg = true;
 boolean showingControls = true;
 boolean showTails = false;
+boolean walls = false;
 
 boolean recStarted = false;
 
 //granular synth controls
 boolean stereo = true;
-boolean gRate = true;
+boolean gRate = false;
 boolean pitch = true;
 boolean gSize = true;
 boolean gain = true;
@@ -108,6 +118,25 @@ void drawControls(){
   fill(200,200,200);
   noStroke();
   rect(width-200,0,200,height);
+}
+void drawWalls(){
+  stroke(blackOrWhite_bg ? 255:0);
+  strokeWeight(3);
+  
+  line(leftWall,ceiling,backWall,rightWall,ceiling,backWall);
+  line(leftWall,floor,backWall,rightWall,floor,backWall);
+  line(leftWall,ceiling,backWall,leftWall,floor,backWall);
+  line(rightWall,ceiling,backWall,rightWall,floor,backWall);
+  
+  line(leftWall,ceiling,frontWall,rightWall,ceiling,frontWall);
+  line(leftWall,floor,frontWall,rightWall,floor,frontWall);
+  line(leftWall,ceiling,frontWall,leftWall,floor,frontWall);
+  line(rightWall,ceiling,frontWall,rightWall,floor,frontWall);
+  
+  line(leftWall,ceiling,frontWall,leftWall,ceiling,backWall);
+  line(leftWall,floor,frontWall,leftWall,floor,backWall);
+  line(rightWall,ceiling,frontWall,rightWall,ceiling,backWall);
+  line(rightWall,floor,frontWall,rightWall,floor,backWall);
 }
 void drawAvgData(){
   //to color by vel, only in r/b channels (so that color represents direction in the x/y plane)
@@ -183,6 +212,9 @@ void draw(){
   initializing the object here seems to force all the 'setup' for the main applet to take place first,
   THEN canvas() the second one
   */
+  //colorMode(HSB,400);
+  //pointLight(400, 0, 400, mouseX, mouseY, 0);
+  //colorMode(RGB);
   if(!secondWindowOpen){
     PVector loc = getLocationOnScreen();
     childWindow = new ChildApplet(loc.x+1000,loc.y-53);
@@ -236,6 +268,8 @@ void draw(){
       buttonOffset+=5;
     }
   }
+  if(walls)
+    drawWalls();
 }
 
 void mousePressed(){
@@ -258,9 +292,11 @@ void mousePressed(){
     paused = !paused;
   }
 }
+
 void mouseReleased(){
   releaseSliders();
 }
+
 void keyPressed(){
   if(key == 'c'){
     background(0);
