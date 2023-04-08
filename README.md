@@ -54,6 +54,6 @@ Buttons along the top of the screen control murmur's visual appearance. From lef
 - color each bird by its unique color, or by its velocity vector. Velocity by default, which *usually* helps visually highlight the subflocks within the group.
 - toggle between a black and white background, *_night mode baby_*.
 
-The logic behind the flocking sim is stolen directly from [Craig Reynold's 1986 "Boids" algorithm](https://www.red3d.com/cwr/boids/) and implemented here. Craig Reynold's website has a great description of the mathematics and the biological significant of the algorithm, and it does a really great job of creating unexpected and rule-based chaos in a musical system.
+The logic behind the flocking sim is stolen directly from [Craig Reynold's 1986 "Boids" algorithm](https://www.red3d.com/cwr/boids/). Reynold's website has a great description of the mathematics and the biological significant of the algorithm, and it does a really great job of creating unexpected and rule-based chaos in a musical system.
  
  ![A Pretty Pic](/resources/images/img2_header.png)
