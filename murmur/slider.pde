@@ -135,6 +135,8 @@ Slider randomSlider;
 Slider orbitSlider;
 Slider perceptionSlider;
 
+Slider playbackSpeedSlider;
+
 Slider groupPositionToleranceSlider;
 Slider groupHeadingToleranceSlider;
 
@@ -143,33 +145,43 @@ void makeSliders(){
   volumeSlider = new Slider(width-30,890,30,200,0,2,1,"Volume",0);
   volumeSlider.textType = 1;
   
-  avoidanceSlider = new Slider(70,50,30,100,0,5,5-1.5,"Avoidance",-1);
+  //playbackSpeedSlider = new Slider(width-60,890,30,200,0,2,1,"Playback Speed",0);
+  //playbackSpeedSlider.textType = 1;
+  
+  avoidanceSlider = new Slider(70,height-120,30,100,0,5,5-1.5,"Avoidance",-1);
   avoidanceSlider.colorByVal = true;
-  avoidanceSlider.c1 = color(0,255,0);
-  avoidanceSlider.c2 = color(0,0,255);
+  avoidanceSlider.c1 = color(0,255,100);
+  avoidanceSlider.c2 = color(255,0,0);
   
-  cohesionSlider = new Slider(70,110,30,100,0,5,5-1.1,"Cohesion",-1);
+  cohesionSlider = new Slider(70,height-180,30,100,0,5,5-1.1,"Cohesion",-1);
   cohesionSlider.colorByVal = true;
-  cohesionSlider.c1 = color(0,255,120);
-  cohesionSlider.c2 = color(100,100,255);
+  cohesionSlider.c1 = color(255,0,0);
+  cohesionSlider.c2 = color(0,0,255);
   
-  orientationSlider = new Slider(70,170,30,100,0,5,5-1.2,"Orientation",-1);
+  orientationSlider = new Slider(70,height-240,30,100,0,5,5-1.2,"Orientation",-1);
   orientationSlider.colorByVal = true;
   orientationSlider.c1 = color(255,255,0);
   orientationSlider.c2 = color(255,0,0);
   
-  randomSlider = new Slider(70,230,30,100,0,5,5-1,"Breeze",-1);
+  randomSlider = new Slider(70,height-300,30,100,0,5,5-1,"Breeze",-1);
   randomSlider.colorByVal = true;
-  randomSlider.c1 = color(255,255,255);
+  randomSlider.c1 = color(0,0,255);
   randomSlider.c2 = color(0,255,0);
   
-  orbitSlider = new Slider(70,290,30,100,1,500,500-300,"Orbit",-1);
-  perceptionSlider = new Slider(70,350,30,100,0,200,200-50,"Perception",-1);
+  orbitSlider = new Slider(70,height-360,30,100,1,500,500-300,"Orbit",-1);
+  orbitSlider.colorByVal = true;
+  orbitSlider.c1 = color(0,255,255);
+  orbitSlider.c2 = color(255,255,0);
   
-  groupPositionToleranceSlider = new Slider(70,550,30,100,0,1000,1000-100,"Position Tolerance",-1);
-  groupHeadingToleranceSlider = new Slider(70,610,30,100,0,360,0,"Heading Tolerance",-1);
+  perceptionSlider = new Slider(70,height-420,30,100,0,200,200-50,"Perception Radius",-1);
+  perceptionSlider.colorByVal = true;
+  perceptionSlider.c1 = color(255,255,100);
+  perceptionSlider.c2 = color(200,200,200);
   
-  sliders = new Slider[9];
+  //groupPositionToleranceSlider = new Slider(70,550,30,100,0,1000,1000-100,"Position Tolerance",-1);
+  //groupHeadingToleranceSlider = new Slider(70,610,30,100,0,360,270,"Heading Tolerance",-1);
+  
+  sliders = new Slider[7];
   sliders[0] = volumeSlider;
   sliders[1] = avoidanceSlider;
   sliders[2] = cohesionSlider;
@@ -177,8 +189,7 @@ void makeSliders(){
   sliders[4] = randomSlider;
   sliders[5] = orbitSlider;
   sliders[6] = perceptionSlider;
-  sliders[7] = groupPositionToleranceSlider;
-  sliders[8] = groupHeadingToleranceSlider;
+  //sliders[7] = playbackSpeedSlider;
 }
 void displaySliders(){
   for(int i = 0; i<sliders.length; i++){
@@ -216,8 +227,6 @@ void moveSliders(){
   randomModifier = randomSlider.max-randomSlider.currentVal;
   orbitR = orbitSlider.max - orbitSlider.currentVal;
   perceptionR = perceptionSlider.max - perceptionSlider.currentVal;
-  positionTolerance = int(groupPositionToleranceSlider.max - groupPositionToleranceSlider.currentVal);
-  headingTolerance = radians(groupHeadingToleranceSlider.max - groupHeadingToleranceSlider.currentVal);
 }
 
 void releaseSliders(){

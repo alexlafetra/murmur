@@ -69,19 +69,23 @@ void endRecording(){
   }  
 }
 
+
 void loadSample(){
    Sample sample = SampleManager.sample(filename);
    player = new GranularSamplePlayer(sample);
+   player.setLoopType(SamplePlayer.LoopType.LOOP_ALTERNATING);
+   //link controls to synth and link Beads together to form audio out
+   player.setGrainInterval(grainRate);
+   player.setGrainSize(grainSize);
+   player.setRandomness(randomness);
+   player.setPitch(samplePitch);
 }
 
 void startplayer() {
    ac = new AudioContext();
    ac = AudioContext.getDefaultContext();
-   
-   loadSample();
-   //loop the sample at its end points
-   player.setLoopType(SamplePlayer.LoopType.LOOP_ALTERNATING);
-   
+   g = new Gain(1, 0.1);
+
    //glide controls
    grainRate = new Glide(ac,0,100);
    grainSize = new Glide(ac,0.1,100);
@@ -89,27 +93,26 @@ void startplayer() {
    randomness = new Glide(ac,0,1);
    pan = new Panner(ac);
    gainGlide = new Glide(ac,0.1,10);
+   reverbSize = new Glide(ac,0.1,0);
    
    reverb = new Reverb(ac,2);
-   reverb.setSize(1);
+   reverb.pause(!reverbing);
    
    //gain that's controlled by flock
-   g = new Gain(1, 0.1);
    g.setGain(gainGlide);
    //master gain, controlled by slider
    masterGain = new Gain(1,0.1);
    masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
+   
+  loadSample();
 
-   //link controls to synth and link Beads together to form audio out
-   player.setGrainInterval(grainRate);
-   player.setGrainSize(grainSize);
-   player.setRandomness(randomness);
-   player.setPitch(samplePitch);
    g.addInput(player);//player feeds into g
    pan.addInput(g);//g feed into pan
    reverb.addInput(pan);//pan feeds into reverb
    masterGain.addInput(pan);//pan feeds into masterGain
+   masterGain.addInput(reverb);
    ac.out.addInput(masterGain);//masterGain feeds into ac
+   
    ac.start();
 }
 
@@ -134,6 +137,11 @@ void getData(){
   }
   headingVar.div(flock.length);
   headingVariance = headingVar.mag();
+}
+
+void toggleReverb(){
+  reverbing = !reverbing;
+  reverb.pause(!reverbing);
 }
 void updateGrains(){
   if(!paused){
@@ -202,5 +210,14 @@ void updateGrains(){
   }
   else{
     pan.setPos(0);
+  }
+  if(reverbing){
+    //reverb.setSize(map(avgDiff_Position,100,400,0,1));
+    //averageing so you don't get as many reverb clicks
+    reverb.setSize(reverb.getSize()+(map(avgDiff_Position,0,1000,0,1)-reverb.getSize()/4));
+    //reverb.setSize(reverb.getSize()+(map(headingVariance,0,60,0,1)-reverb.getSize()/4));
+  }
+  else{
+    reverb.setSize(0);
   }
 }

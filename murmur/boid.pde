@@ -54,17 +54,8 @@ class Boid{
     PVector floorLocation = new PVector(position.x,floorHeight,position.z);
     PVector floorF = new PVector(0,0,0);
     float d = position.y - floorHeight;
-    //if you're above the floor
-    if(d<0){
-      //if it can 'see' the floor
-      //if(abs(d)<perceptionR){
-        //floorF = PVector.sub(floorLocation,position);
-        //floorF.mult(1/pow(d,2));
-        //floorF.limit(maxForce);
-      //}
-    }
     //if you're below the floor
-    else{
+    if(d>=0){
       floorF = PVector.sub(floorLocation,position);
       floorF.mult(d);
       floorF.limit(maxForce);
@@ -134,11 +125,11 @@ class Boid{
     //force that steers boids away from the average location of nearby boids
     PVector avoidance = new PVector(0,0,0);
     int total = 0;
-    float avgDist = 0;
+    float totalDist = 0;
     //adding up the velocities of nearby voids
     for(int i = 0; i<boids.length; i++){
       float d = PVector.dist(boids[i].position,position);
-      avgDist+=d;
+      totalDist+=d;
       if(boids[i] != this && d < perceptionR){
         
         //add position to the average location vector
@@ -151,7 +142,7 @@ class Boid{
         total++;
       }
     }
-    avgDiff_Position+=avgDist;
+    avgDiff_Position+=totalDist;
     if(total>0){
       //divide to get the average orientation
       avgOrientation.div(total);
@@ -227,8 +218,6 @@ class Boid{
     vertex(0,0,boidSize*3);
     vertex(-boidSize/2,0,0);
     endShape();
-    //for rendering as a circle instead
-    //ellipse(0,0,boidSize,boidSize);
     popMatrix();
   }
 }

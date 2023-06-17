@@ -7,13 +7,13 @@ general it sounds less choppy and looks like it sways with the shape of the floc
 
 //initial audio file vv
 //String filename = "test1_sdc.mp3";
-String filename = "test2_q.mp3";
-//String filename = "test3_chopin.mp3";
+//String filename = "test2_q.mp3";
+String filename = "test3_chopin.mp3";
 String buttonText;
 //parameters for the flock sim
 
 //number of birds
-int numberOfBoids = 1500;
+int numberOfBoids = 1000;
 //avoidance weight
 float avoidanceModifier = 1.5;
 //attraction/cohesion weight
@@ -36,16 +36,16 @@ float orbitR = 300;
 //floor that the birds are repelled from
 float floorHeight = 800;//DEPRECATED
 
-int rightWall = 900;
-int leftWall = 100;
-int floor = 900;
-int ceiling = 100;
+int rightWall = 1000;
+int leftWall = 0;
+int floor = 1000;
+int ceiling = 0;
 int frontWall = 50;
 int backWall = -1000;
 
 //display controls
 boolean paused = true;
-int colorStyle = 1;
+int colorStyle = 0;
 boolean showOrbitPoint = false;
 boolean showAvgPos = false;
 boolean blackOrWhite_bg = true;
@@ -63,6 +63,7 @@ boolean gSize = true;
 boolean gain = true;
 boolean gRandom = true;
 boolean reverse = true;
+boolean reverbing = false;
 
 boolean secondWindowOpen = false;
 ChildApplet childWindow;
@@ -91,6 +92,7 @@ void setup(){
   //just so the orb starts w/ the boids
   getData();
 }
+
 //counts the recordings in the "recordings" folder
 int countRecordings(){
   File f = dataFile("recordings");
@@ -114,11 +116,7 @@ void updateOrbitPoint(){
   orbitPoint.x = mouseX;
   orbitPoint.y = mouseY;
 }
-void drawControls(){
-  fill(200,200,200);
-  noStroke();
-  rect(width-200,0,200,height);
-}
+
 void drawWalls(){
   stroke(blackOrWhite_bg ? 255:0);
   strokeWeight(3);
@@ -187,6 +185,7 @@ void loadFile(File selectedFile){
   startplayer();
   loadSample.state = true;
 }
+
 boolean isValidAudioFileType(String s){
   if(s.endsWith(".mp3")|s.endsWith(".wav")){
     return true;
@@ -195,6 +194,7 @@ boolean isValidAudioFileType(String s){
     return false;
   }
 }
+
 //getting x/y coord of screen
 PVector getLocationOnScreen(){
   PVector location = new PVector();
@@ -216,13 +216,13 @@ class Group{
     homies = new ArrayList<Boid>();
     homies.add(b);
     c = b.c;
-    //c = color(map(b.velocity.x,-maxSpeed,maxSpeed,0,255),map(b.velocity.y,-maxSpeed,maxSpeed,0,255),map(b.velocity.z,0,maxSpeed,-maxSpeed,255));
   }
 }
 
 float headingTolerance = 10;
 int positionTolerance = 100;
 ArrayList<Group>groups;
+boolean createGroups = false;
 boolean averageGroupData = false;
 boolean updateWithinGroups = false;
 
@@ -267,8 +267,8 @@ void updateGroups(){
     if(updateWithinGroups){
       avgDiff_Position = 0;
       updatePhysicsOfGroup(groups.get(i));
-      avgDiff_Position/=groups.get(i).homies.size();
       tempDiff += avgDiff_Position;
+      tempDiff = tempDiff/groups.get(i).homies.size();
     }
     //println(groups.get(i).homies.size());
       
@@ -277,7 +277,7 @@ void updateGroups(){
     drawSubGroups(groups.get(i));
   }
   avgDiff_Position = (tempDiff/groups.size());
-  //println(avgDiff_Position);
+  //sampleList.update();
 }
 
 void updatePhysicsOfGroup(Group g){
@@ -299,8 +299,13 @@ void drawSubGroups(Group g){
   //fill(g.c);
   stroke(g.c);
   noFill();
-  if(g.homies.size()>1)
-    ellipse(g.location.x,g.location.y,g.homies.size(),g.homies.size());
+  if(g.homies.size()>1){
+    pushMatrix();
+    //ellipse(g.location.x,g.location.y,g.homies.size(),g.homies.size());
+    translate(g.location.x,g.location.y,g.location.z);
+    sphere(map(g.homies.size(),0,flock.length,0,200));
+    popMatrix();
+  }
 }
 
 void draw(){
@@ -312,9 +317,6 @@ void draw(){
   initializing the object here seems to force all the 'setup' for the main applet to take place first,
   THEN canvas() the second one
   */
-  //colorMode(HSB,400);
-  //pointLight(400, 0, 400, mouseX, mouseY, 0);
-  //colorMode(RGB);
   if(!secondWindowOpen){
     PVector loc = getLocationOnScreen();
     childWindow = new ChildApplet(loc.x+1000,loc.y-53);
@@ -328,28 +330,19 @@ void draw(){
     else
       background(255);
   }
-  if(updateWithinGroups)
-    updateGroups();
-  //Boid[] buffer = flock;
-  //drawBounds();
   for(int i = 0; i<flock.length; i++){
     if(!paused){
       //updating physics of each boid
       //buffer[i].updatePhysics(flock);
-      if(!updateWithinGroups){
-        avgDiff_Position = 0;
-        flock[i].updatePhysics(flock);
-        avgDiff_Position/=flock.length;
-      }
+      avgDiff_Position = 0;
+      flock[i].updatePhysics(flock);
+      avgDiff_Position/=flock.length;
       //updating location of each boid
       flock[i].updateLocation();
     }
     //drawing each boid
-    if(!updateWithinGroups)
-      flock[i].render();
-    //buffer[i].render();
+    flock[i].render();
   }
-  //flock = buffer;
   if(!paused){
     updateGrains();
   }
@@ -367,14 +360,15 @@ void draw(){
     displaySliders();
     moveSliders();
     if(buttonOffset>0){
-      buttonOffset-=5;
+      buttonOffset-=10;
     }
   }
   else{
-    if(buttonOffset<60){
+    if(buttonOffset<120){
+
       displayButtons();
       displaySliders();
-      buttonOffset+=5;
+      buttonOffset+=10;
     }
   }
   if(walls)

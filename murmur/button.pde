@@ -160,36 +160,44 @@ Button tails;
 Button resetParams;
 Button randomizeParams;
 
-Button updatePhysicsInGroups;
-Button avgGroupData;
+Button reverbButton;
+
+Button jumpToRandom;
+
+//Button usingGroups;
+//Button avgGroupData;
 
 Button[] buttons;
 
 void makeButtons(){
-  reset = new Button(width-50,10,40,40, color(255,50,50), false, "reset",1);
-  ptch = new Button(width-50,60,40,40, color(255,233,28), pitch, "pitch",0);
-  streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "pan",0);
-  grnRate = new Button(width-50,160,40,40, color(0,255,200), gRate, "grain rate",0);
-  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "grain size",0);
-  vol = new Button(width-50,260,40,40, color(200,55,100), gain, "gain",0);
-  rndm = new Button(width-50,310,40,40, color(0,255,100), gRandom, "noise",0);
-  rev = new Button(width-50,360,40,40, color(75,157,255), paused, "direction",0);
-  loadSample = new Button(width-50,410,40,40,color(255,150,50), true, "load new sample",0);
-  rec = new Button(width-50,460,40,40, color(222,22,29), paused, "record",4);
+  reset = new Button(width-50,10,40,40, color(255,50,50), true, "Reset",1);
+  ptch = new Button(width-50,60,40,40, color(0,233,28), pitch, "Pitch",0);
+  streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "Pan",0);
+  grnRate = new Button(width-50,160,40,40, color(150,150,200), gRate, "Grain Rate",0);
+  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "Grain Size",0);
+  vol = new Button(width-50,260,40,40, color(200,55,100), gain, "Gain",0);
+  rndm = new Button(width-50,310,40,40, color(255,200,200), gRandom, "Noise",0);
+  rev = new Button(width-50,360,40,40, color(200,100,255), paused, "Direction",0);
+  reverbButton = new Button(width-50,410,40,40, color(200,200,255), reverbing, "Reverb",0);
+  loadSample = new Button(width-50,460,40,40,color(255,150,50), true, "Load New Sample",0);
+  rec = new Button(width-50,560,40,40, color(222,22,29), paused, "Record",4);
   
   //display controls
-  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "swap background",1);
-  byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "color style",1);
-  showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "enable walls",1);
-  showAvg = new Button(width-250,10,40,40,color(200,55,100), showAvgPos, "show average position",1);
-  tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "show tails",1);
+  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "Swap Background",1);
+  byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "Color Style",1);
+  showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "Enable Walls",1);
+  showAvg = new Button(width-250,10,40,40,color(200,55,100), showAvgPos, "Show Average",1);
+  tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "Toggle Screen Refresh",1);
 
   //buttons for flock parameters
-  resetParams = new Button(20,400,40,40, color(255,250,50), true, "reset",3);
-  randomizeParams = new Button(20,460,40,40, color(50,250,255), true, "randomize",3);
+  resetParams = new Button(20,height-60,40,40, color(255,0,50), true, "Reset",3);
+  randomizeParams = new Button(80,height-60,40,40, color(0,0,255), true, "Randomize Flock",3);
   
-  avgGroupData= new Button(20,660,40,40, color(255,100,255), averageGroupData, "Average Group Data",3);
-  updatePhysicsInGroups = new Button(20,720,40,40, color(255,150,0),updateWithinGroups, "Update Groups Only",3);
+  jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead",0);
+
+  
+  //avgGroupData= new Button(20,660,40,40, color(255,100,255), averageGroupData, "Average Group Data",3);
+  //usingGroups = new Button(20,720,40,40, color(255,150,0),createGroups, "Use Groups",3);
   
   //putting all the buttons into an array
   buttons = new Button[19];
@@ -210,8 +218,10 @@ void makeButtons(){
   buttons[14] = tails;
   buttons[15] = resetParams;
   buttons[16] = randomizeParams;
-  buttons[17] = avgGroupData;
-  buttons[18] = updatePhysicsInGroups;
+  //buttons[17] = avgGroupData;
+  //buttons[18] = usingGroups;
+  buttons[17] = reverbButton;
+  buttons[18] = jumpToRandom;
 }
 
 //resets the flock parameters
@@ -223,6 +233,15 @@ void resetParameters(){
   perceptionR = 50;
   orbitR = 300;
   makeSliders();
+}
+// Java program to demonstrate working of
+// Math.random() to generate random numbers
+import java.util.*;
+   
+void jumpToRandomLocation(){
+  double sampleLength = player.getSample().getLength();
+  double randomValue = (sampleLength) * Math.random();
+  player.setPosition(randomValue);
 }
 
 void reset(){
@@ -343,14 +362,23 @@ boolean checkButtons(){
     randomizeSliders();
     atLeastOne = true;
   }
-  if(avgGroupData.isMousedOver()){
-    averageGroupData = !averageGroupData;
-    avgGroupData.state = averageGroupData;
+  //if(avgGroupData.isMousedOver()){
+  //  averageGroupData = !averageGroupData;
+  //  avgGroupData.state = averageGroupData;
+  //  atLeastOne = true;
+  //}
+  //if(usingGroups.isMousedOver()){
+  //  createGroups = !createGroups;
+  //  usingGroups.state = createGroups;
+  //  atLeastOne = true;
+  //}
+  if(reverbButton.isMousedOver()){
+    toggleReverb();
+    reverbButton.state = reverbing;
     atLeastOne = true;
   }
-  if(updatePhysicsInGroups.isMousedOver()){
-    updateWithinGroups = !updateWithinGroups;
-    updatePhysicsInGroups.state = updateWithinGroups;
+  if(jumpToRandom.isMousedOver()){
+    jumpToRandomLocation();
     atLeastOne = true;
   }
   return atLeastOne;
