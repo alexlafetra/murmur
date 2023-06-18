@@ -63,20 +63,20 @@ class Button{
       strokeWeight(7);
       rectMode(CENTER);
       if(isMousedOver()){
-        rect(w/2+buttonOffset,h/2,w+4,h+4,5);
+        rect(w/2+buttonOffset,h/2,w+4,h+4,10);
       }
       else{
-        rect(w/2+buttonOffset,h/2,w,h,5);
+        rect(w/2+buttonOffset,h/2,w,h,10);
       }
     }
     else if(type == 1){
       strokeWeight(7);
       rectMode(CENTER);
       if(isMousedOver()){
-        rect(w/2,h/2-buttonOffset,w+4,h+4,5);
+        rect(w/2,h/2-buttonOffset,w+4,h+4,10);
       }
       else{
-        rect(w/2,h/2-buttonOffset,w,h,5);
+        rect(w/2,h/2-buttonOffset,w,h,10);
       }
     }
     //rec button, since it's a circle
@@ -164,8 +164,6 @@ Button reverbButton;
 
 Button jumpToRandom;
 
-//Button usingGroups;
-//Button avgGroupData;
 
 Button[] buttons;
 
@@ -181,6 +179,7 @@ void makeButtons(){
   reverbButton = new Button(width-50,410,40,40, color(200,200,255), reverbing, "Reverb",0);
   loadSample = new Button(width-50,460,40,40,color(255,150,50), true, "Load New Sample",0);
   rec = new Button(width-50,560,40,40, color(222,22,29), paused, "Record",4);
+  jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead",0);
   
   //display controls
   bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "Swap Background",1);
@@ -190,15 +189,9 @@ void makeButtons(){
   tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "Toggle Screen Refresh",1);
 
   //buttons for flock parameters
-  resetParams = new Button(20,height-60,40,40, color(255,0,50), true, "Reset",3);
-  randomizeParams = new Button(80,height-60,40,40, color(0,0,255), true, "Randomize Flock",3);
-  
-  jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead",0);
-
-  
-  //avgGroupData= new Button(20,660,40,40, color(255,100,255), averageGroupData, "Average Group Data",3);
-  //usingGroups = new Button(20,720,40,40, color(255,150,0),createGroups, "Use Groups",3);
-  
+  resetParams = new Button(20,height-60,40,40, color(255,200,200), true, "Reset",0);
+  randomizeParams = new Button(80,height-60,40,40, color(200,200,255), true, "Randomize Flock",0);
+    
   //putting all the buttons into an array
   buttons = new Button[19];
   buttons[0] = reset;
@@ -345,13 +338,15 @@ boolean checkButtons(){
   if(rec.isMousedOver()){
     if(recStarted){
       endRecording();
-      recStarted = false;
     }
     else{
-      startRecording();
-      recStarted = true;
+      if(outputPath == null){
+        selectFolder("Select a folder to record into","gotFolder");
+      }
+      else{
+        startRecording();
+      }
     }
-    rec.state = !recStarted;
     atLeastOne = true;
   }
   if(resetParams.isMousedOver()){
@@ -362,16 +357,6 @@ boolean checkButtons(){
     randomizeSliders();
     atLeastOne = true;
   }
-  //if(avgGroupData.isMousedOver()){
-  //  averageGroupData = !averageGroupData;
-  //  avgGroupData.state = averageGroupData;
-  //  atLeastOne = true;
-  //}
-  //if(usingGroups.isMousedOver()){
-  //  createGroups = !createGroups;
-  //  usingGroups.state = createGroups;
-  //  atLeastOne = true;
-  //}
   if(reverbButton.isMousedOver()){
     toggleReverb();
     reverbButton.state = reverbing;

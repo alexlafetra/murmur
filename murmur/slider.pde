@@ -62,28 +62,16 @@ class Slider{
     //get the relative height
     translate(0,map(currentVal,min,max,-h/2,h/2),1);
     if(isGrabbed()){
-      rect(0,0,w+5,(w+5)/2,5);
+      rect(0,0,w+5,(w+5)/2,10);
     }
     else{
-      rect(0,0,w,w/2,5);
+      rect(0,0,w,w/2,10);
     }
     popMatrix();
     textAlign(CENTER);
     //drawing title text
     if(isGrabbed()){
-      //textSize(20);
-      //if(blackOrWhite_bg)
-      // fill(255);
-      //else
-      // fill(0);
-      //pushMatrix();
-      //if(type >= 0)//rotate for vertical sliders
-      //  rotateZ(radians(90));
-      //else
-      //  rotateZ(-radians(90));
-      //text(txt,0,w+5);
       buttonText = txt;
-      //popMatrix();
     }
     //if it's being moved, draw the current val
     if(isBeingMoved){
@@ -142,41 +130,42 @@ Slider groupHeadingToleranceSlider;
 
 Slider[] sliders;
 void makeSliders(){
-  volumeSlider = new Slider(width-30,890,30,200,0,2,1,"Volume",0);
+  volumeSlider = new Slider(width-30,890,30,200,0,10,7,"Volume",0);
   volumeSlider.textType = 1;
   
   //playbackSpeedSlider = new Slider(width-60,890,30,200,0,2,1,"Playback Speed",0);
   //playbackSpeedSlider.textType = 1;
   
-  avoidanceSlider = new Slider(70,height-120,30,100,0,5,5-1.5,"Avoidance",-1);
-  avoidanceSlider.colorByVal = true;
-  avoidanceSlider.c1 = color(0,255,100);
-  avoidanceSlider.c2 = color(255,0,0);
-  
-  cohesionSlider = new Slider(70,height-180,30,100,0,5,5-1.1,"Cohesion",-1);
+  cohesionSlider = new Slider(70,height-400,30,100,0,5,5-1.1,"Cohesion",-1);
   cohesionSlider.colorByVal = true;
-  cohesionSlider.c1 = color(255,0,0);
-  cohesionSlider.c2 = color(0,0,255);
+  cohesionSlider.c1 = color(255,200,200);
+  cohesionSlider.c2 = color(200,200,255);
   
-  orientationSlider = new Slider(70,height-240,30,100,0,5,5-1.2,"Orientation",-1);
-  orientationSlider.colorByVal = true;
-  orientationSlider.c1 = color(255,255,0);
-  orientationSlider.c2 = color(255,0,0);
+  avoidanceSlider = new Slider(70,height-340,30,100,0,5,5-1.5,"Avoidance",-1);
+  avoidanceSlider.colorByVal = true;
+  avoidanceSlider.c1 = color(200,255,100);
+  avoidanceSlider.c2 = color(255,200,200);
   
-  randomSlider = new Slider(70,height-300,30,100,0,5,5-1,"Breeze",-1);
+  randomSlider = new Slider(70,height-280,30,100,0,5,5-1,"Breeze",-1);
   randomSlider.colorByVal = true;
-  randomSlider.c1 = color(0,0,255);
-  randomSlider.c2 = color(0,255,0);
+  randomSlider.c1 = color(200,200,255);
+  randomSlider.c2 = color(200,25520,0);
   
-  orbitSlider = new Slider(70,height-360,30,100,1,500,500-300,"Orbit",-1);
-  orbitSlider.colorByVal = true;
-  orbitSlider.c1 = color(0,255,255);
-  orbitSlider.c2 = color(255,255,0);
+  orientationSlider = new Slider(70,height-220,30,100,0,5,5-1.2,"Orientation",-1);
+  orientationSlider.colorByVal = true;
+  orientationSlider.c1 = color(255,255,200);
+  orientationSlider.c2 = color(255,200,200);
   
-  perceptionSlider = new Slider(70,height-420,30,100,0,200,200-50,"Perception Radius",-1);
+  perceptionSlider = new Slider(70,height-160,30,100,0,200,200-50,"Perception Radius",-1);
   perceptionSlider.colorByVal = true;
   perceptionSlider.c1 = color(255,255,100);
-  perceptionSlider.c2 = color(200,200,200);
+  perceptionSlider.c2 = color(200,200,255);
+  
+  orbitSlider = new Slider(70,height-100,30,100,1,500,500-300,"Orbit",-1);
+  orbitSlider.colorByVal = true;
+  orbitSlider.c1 = color(200,255,255);
+  orbitSlider.c2 = color(255,255,200);
+  
   
   //groupPositionToleranceSlider = new Slider(70,550,30,100,0,1000,1000-100,"Position Tolerance",-1);
   //groupHeadingToleranceSlider = new Slider(70,610,30,100,0,360,270,"Heading Tolerance",-1);

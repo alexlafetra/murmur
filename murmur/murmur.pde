@@ -9,6 +9,7 @@ general it sounds less choppy and looks like it sways with the shape of the floc
 //String filename = "test1_sdc.mp3";
 //String filename = "test2_q.mp3";
 String filename = "test3_chopin.mp3";
+String outputPath = null;
 String buttonText;
 //parameters for the flock sim
 
@@ -76,7 +77,7 @@ void setup(){
   background(0);
   //drop = new SDrop(this);
   filename = dataPath("samples/"+filename);
-  numberOfRecordings = countRecordings();
+  numberOfRecordings = 0;
   avgVel = new PVector(0,0,0);
   avgPos = new PVector(0,0,0);
   //allocate memory for the flock
@@ -93,11 +94,6 @@ void setup(){
   getData();
 }
 
-//counts the recordings in the "recordings" folder
-int countRecordings(){
-  File f = dataFile("recordings");
-  return f.list().length;
-}
 void drawPause(){
   int x = width/2;
   int y = height/2;

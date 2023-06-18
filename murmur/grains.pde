@@ -38,7 +38,16 @@ float avgDiff_Position = 0;
 float avgDiff_Heading = 0;
 float headingVariance;
 
+//callback for selecting an output folder
+void gotFolder(File f){
+  if (f != null) {
+    outputPath = f.getAbsolutePath();
+    startRecording();
+  }
+}
+
 void startRecording(){
+  rec.state = false;
   //default is a 1-min (60,000ms) stereo sample,
   outputSample = new Sample(60000);
   //new recorder object
@@ -51,22 +60,27 @@ void startRecording(){
   //this ALONE tho won't record any audio
   ac.out.addDependent(recorder);
   recorder.start();
+  recStarted = true;
 }
+
 void endRecording(){
   //ending recorder
   recorder.kill();
   //cropping the sample, if it's shorter than 1 min
   recorder.clip();
   //writing the sample
-  try{
-    outputSample.write(dataPath("recordings/rec"+str(numberOfRecordings)+".wav"));
-    numberOfRecordings++;
+  if(outputPath != null){
+    try{
+      outputSample.write(outputPath+"/murmur"+str(numberOfRecordings)+".wav");
+      numberOfRecordings++;
+    }
+    catch(Exception e){
+      println(e.getMessage());
+      e.printStackTrace();
+    }  
   }
-  catch(Exception e){
-    println("oops!");
-    println(e.getMessage());
-    e.printStackTrace();
-  }  
+  recStarted = false;
+  rec.state = true;
 }
 
 
