@@ -1,7 +1,7 @@
 
 - [x] audio file loader
-- [ ] selectable output directory
-- [ ] flocking parameter controls
+- [x] selectable output directory
+- [x] flocking parameter controls
 - [ ] presets?
 - [ ] multisampling
 - [ ] midi i/o
