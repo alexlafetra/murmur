@@ -8,6 +8,7 @@ float boidSize = 10;
 //limit on forces
 float maxForce = 0.5;
 float maxSpeed = 10;
+
 class Boid{
   //data for position, vel, and acceleration
   PVector position;
@@ -53,22 +54,40 @@ class Boid{
     PVector floorLocation = new PVector(position.x,floorHeight,position.z);
     PVector floorF = new PVector(0,0,0);
     float d = position.y - floorHeight;
-    //if you're above the floor
-    if(d<0){
-      //if it can 'see' the floor
-      //if(abs(d)<perceptionR){
-        floorF = PVector.sub(floorLocation,position);
-        floorF.mult(1/pow(d,2));
-        floorF.limit(maxForce);
-      //}
-    }
     //if you're below the floor
-    else{
-        floorF = PVector.sub(floorLocation,position);
+    if(d>=0){
+      floorF = PVector.sub(floorLocation,position);
       floorF.mult(d);
       floorF.limit(maxForce);
     }
     return floorF;
+  }
+  PVector wallForce(){
+    PVector wallF = new PVector(0,0,0);
+    PVector floorF = new PVector(0,0,0);
+    PVector frontF = new PVector(0,0,0);
+    if(position.x>rightWall){
+      wallF = new PVector(rightWall-position.x,0,0);
+    }
+    else if(position.x<leftWall){
+      wallF = new PVector(leftWall-position.x,0,0);
+    }
+    if(position.y<ceiling){
+      floorF = new PVector(0,ceiling-position.y,0);
+    }
+    else if(position.y>floor){
+      floorF = new PVector(0,floor-position.y,0);
+    }
+    if(position.z<backWall){
+      frontF = new PVector(0,0,backWall-position.z);
+    }
+    else if(position.z>frontWall){
+      frontF = new PVector(0,0,frontWall-position.z);
+    }
+    wallF.add(floorF);
+    wallF.add(frontF);
+    wallF.limit(maxForce);
+    return wallF;
   }
   
   //force that should simulate the way it's more efficient to travel perpendicular to gravity
@@ -99,7 +118,6 @@ class Boid{
   }
 
   void updatePhysics(Boid[] boids){
-    avgDiff_Position = 0;
     //force that steers boids to face the same heading as 'nearby' boids
     PVector avgOrientation = new PVector(0,0,0);
     //force that steers boids to the avg location of nearby boids
@@ -107,11 +125,11 @@ class Boid{
     //force that steers boids away from the average location of nearby boids
     PVector avoidance = new PVector(0,0,0);
     int total = 0;
-    float avgDist = 0;
+    float totalDist = 0;
     //adding up the velocities of nearby voids
     for(int i = 0; i<boids.length; i++){
       float d = PVector.dist(boids[i].position,position);
-      avgDist+=d;
+      totalDist+=d;
       if(boids[i] != this && d < perceptionR){
         
         //add position to the average location vector
@@ -124,7 +142,7 @@ class Boid{
         total++;
       }
     }
-    avgDiff_Position+=avgDist/numberOfBoids;
+    avgDiff_Position+=totalDist;
     if(total>0){
       //divide to get the average orientation
       avgOrientation.div(total);
@@ -156,28 +174,43 @@ class Boid{
     force.add(avgLocation.mult(cohesionModifier));
     force.add(avoidance.mult(avoidanceModifier));
     force.add(randomForce(maxForce).mult(randomModifier));
-    force.add(orbit().mult(orbitModifier));
-    force.add(floorForce());
+     
+    //flock is either constrained by walls, or attracted to the cursor
+    if(walls)
+      force.add(wallForce());
+    else
+      force.add(orbit().mult(orbitModifier));
     acceleration = force;
   }
 
   //drawing the boid
   void render(){
     noStroke();
-    if(colorByHeading){
-      color a = color(map(velocity.x,-maxSpeed,maxSpeed,0,255),map(velocity.y,-maxSpeed,maxSpeed,0,255),map(velocity.z,0,maxSpeed,-maxSpeed,255));
+    //color by c
+    if(colorStyle == 0){
       //color a = color(map(acceleration.x,0,maxForce,0,255),map(acceleration.y,0,maxForce,0,255),map(acceleration.z,0,maxForce,0,255));
-    //color a = color(map(position.x,0,width,0,255),map(position.y,0,height,0,255),map(position.z,0,zDepth,0,255));
-      fill(a);
-    }
-    else{
       fill(c);
     }
-    //fill(0);
+    //color by vel
+    else if(colorStyle == 1){
+      color a = color(map(velocity.x,-maxSpeed,maxSpeed,0,255),map(velocity.y,-maxSpeed,maxSpeed,0,255),map(velocity.z,0,maxSpeed,-maxSpeed,255));
+      fill(a);
+    }
+    //color b/w
+    else if(colorStyle == 2){
+      stroke(0);
+      strokeWeight(1);
+      fill(255);
+    }
+    //color by pos
+    else if(colorStyle == 3){
+      color a = color(map(position.x,0,width,0,255),map(position.y,0,height,0,255),map(position.z,0,zDepth,0,255));
+      fill(a);
+    }
     pushMatrix();
     translate(position.x,position.y,position.z);
     PVector temp = new PVector(velocity.x,velocity.y,velocity.z);
-    temp.mult(3);
+    temp.mult(4);
     beginShape(TRIANGLE_STRIP);
     vertex(-boidSize/2,0,0);
     vertex(boidSize/2,0,0);
@@ -185,8 +218,6 @@ class Boid{
     vertex(0,0,boidSize*3);
     vertex(-boidSize/2,0,0);
     endShape();
-    //for rendering as a circle instead
-    //ellipse(0,0,boidSize,boidSize);
     popMatrix();
   }
 }

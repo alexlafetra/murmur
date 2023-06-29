@@ -35,6 +35,7 @@ class Button{
   Boolean isMousedOver(){
     if(mouseX>=x && mouseX<= x+w && mouseY>=y && mouseY<=y+h){
       cursor(HAND);
+      buttonText = txt;
       return true;
     }
     else{
@@ -62,43 +63,55 @@ class Button{
       strokeWeight(7);
       rectMode(CENTER);
       if(isMousedOver()){
-        rect(w/2+buttonOffset,h/2,w+4,h+4,5);
+        rect(w/2+buttonOffset,h/2,w+4,h+4,10);
       }
       else{
-        rect(w/2+buttonOffset,h/2,w,h,5);
+        rect(w/2+buttonOffset,h/2,w,h,10);
       }
     }
     else if(type == 1){
       strokeWeight(7);
       rectMode(CENTER);
       if(isMousedOver()){
-        rect(w/2,h/2-buttonOffset,w+4,h+4,5);
+        rect(w/2,h/2-buttonOffset,w+4,h+4,10);
       }
       else{
-        rect(w/2,h/2-buttonOffset,w,h,5);
+        rect(w/2,h/2-buttonOffset,w,h,10);
       }
     }
     //rec button, since it's a circle
     else{
       strokeWeight(7);
       //if it's not pressed, or if it is and it's been 500 frames
-      if(state || (frameCount%60)>30){
-        fill(c);
+      if(type == 4){
+        if(state || (frameCount%60)>30){
+          fill(c);
+        }
+        else{
+          fill(0,0,0,0);
+        }
       }
       else{
-        fill(0,0,0,0);
+        if(state)
+          fill(c);
+        else
+          fill(0,0,0,0);
       }
-      if(isMousedOver()){
-        ellipse(w/2+buttonOffset,h/2,w+4,h+4);
+      if(type == 3){
+        if(isMousedOver()){
+          ellipse(w/2-buttonOffset,h/2,w+4,h+4);
+        }
+        else{
+          ellipse(w/2-buttonOffset,h/2,w,h);
+        }
       }
       else{
-        ellipse(w/2+buttonOffset,h/2,w,h);
-      }
-      if(state){
-        txt = "stop recording";
-      }
-      else{
-        txt = "start recording";
+        if(isMousedOver()){
+          ellipse(w/2+buttonOffset,h/2,w+4,h+4);
+        }
+        else{
+          ellipse(w/2+buttonOffset,h/2,w,h);
+        }
       }
     }
     popMatrix();
@@ -114,7 +127,7 @@ class Button{
         }
       }
       pushMatrix();
-      textSize(25);
+      //textSize(25);
       //side buttons
       if(type != 1){
         translate(x+12,510);
@@ -122,9 +135,9 @@ class Button{
       }
       //top buttons
       else{
-        translate(width-320-textWidth(txt),y+40-12);
+        translate(width-320-textWidth(txt),38);
       }
-      text(txt,0,0);
+      //text(txt,0,0);
       popMatrix();
     }
   }
@@ -144,26 +157,86 @@ Button showAvg;
 Button loadSample;
 Button rec;
 Button tails;
+Button resetParams;
+Button randomizeParams;
+
+Button reverbButton;
+
+Button jumpToRandom;
+
+
+Button[] buttons;
+
 void makeButtons(){
-  reset = new Button(width-50,10,40,40, color(255,50,50), false, "reset",1);
-  ptch = new Button(width-50,60,40,40, color(255,233,28), pitch, "pitch",0);
-  streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "pan",0);
-  grnRate = new Button(width-50,160,40,40, color(0,255,200), gRate, "grain Rate",0);
-  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "grain Size",0);
-  vol = new Button(width-50,260,40,40, color(200,55,100), gain, "gain",0);
-  rndm = new Button(width-50,310,40,40, color(0,255,100), gRandom, "noise",0);
-  rev = new Button(width-50,360,40,40, color(75,157,255), paused, "direction",0);
-  loadSample = new Button(width-50,410,40,40,color(255,150,50), true, "load new sample",0);
-  rec = new Button(width-50,460,40,40, color(222,22,29), paused, "record",2);
+  reset = new Button(width-50,10,40,40, color(255,50,50), true, "Reset",1);
+  ptch = new Button(width-50,60,40,40, color(0,233,28), pitch, "Pitch",0);
+  streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "Pan",0);
+  grnRate = new Button(width-50,160,40,40, color(150,150,200), gRate, "Grain Rate",0);
+  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "Grain Size",0);
+  vol = new Button(width-50,260,40,40, color(200,55,100), gain, "Gain",0);
+  rndm = new Button(width-50,310,40,40, color(255,200,200), gRandom, "Noise",0);
+  rev = new Button(width-50,360,40,40, color(200,100,255), paused, "Direction",0);
+  reverbButton = new Button(width-50,410,40,40, color(200,200,255), reverbing, "Reverb",0);
+  loadSample = new Button(width-50,460,40,40,color(255,150,50), true, "Load New Sample",0);
+  rec = new Button(width-50,560,40,40, color(222,22,29), paused, "Record",4);
+  jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead",0);
   
   //display controls
-  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "swap background",1);
-  byHeading = new Button(width-150,10,40,40,color(100,200,255), colorByHeading, "color by orientation",1);
-  showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "show orbit point",1);
-  showAvg = new Button(width-250,10,40,40,color(200,55,100), showAvgPos, "show average position",1);
-  tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "show tails",1);
+  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "Swap Background",1);
+  byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "Color Style",1);
+  showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "Enable Walls",1);
+  showAvg = new Button(width-250,10,40,40,color(200,55,100), showAvgPos, "Show Average",1);
+  tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "Toggle Screen Refresh",1);
 
+  //buttons for flock parameters
+  resetParams = new Button(20,height-60,40,40, color(255,200,200), true, "Reset",0);
+  randomizeParams = new Button(80,height-60,40,40, color(200,200,255), true, "Randomize Flock",0);
+    
+  //putting all the buttons into an array
+  buttons = new Button[19];
+  buttons[0] = reset;
+  buttons[1] = ptch;
+  buttons[2] = streo;
+  buttons[3] = grnRate;
+  buttons[4] = grnSize;
+  buttons[5] = vol;
+  buttons[6] = rndm;
+  buttons[7] = rev;
+  buttons[8] = loadSample;
+  buttons[9] = rec;
+  buttons[10] = bg;
+  buttons[11] = byHeading;
+  buttons[12] = showOrbit;
+  buttons[13] = showAvg;
+  buttons[14] = tails;
+  buttons[15] = resetParams;
+  buttons[16] = randomizeParams;
+  //buttons[17] = avgGroupData;
+  //buttons[18] = usingGroups;
+  buttons[17] = reverbButton;
+  buttons[18] = jumpToRandom;
 }
+
+//resets the flock parameters
+void resetParameters(){
+  avoidanceModifier = 1.5;
+  cohesionModifier = 1.1;
+  orientationModifier = 1.2;
+  randomModifier = 1;
+  perceptionR = 50;
+  orbitR = 300;
+  makeSliders();
+}
+// Java program to demonstrate working of
+// Math.random() to generate random numbers
+import java.util.*;
+   
+void jumpToRandomLocation(){
+  double sampleLength = player.getSample().getLength();
+  double randomValue = (sampleLength) * Math.random();
+  player.setPosition(randomValue);
+}
+
 void reset(){
   player.kill();
   paused = true;
@@ -176,7 +249,7 @@ void reset(){
     flock[i] = new Boid();
   }
   makeButtons();
-  makeSliders();
+  //makeSliders();
   background(0);
   startplayer();
   //just so the orb starts w/ the boids
@@ -185,21 +258,9 @@ void reset(){
 }
 
 void displayButtons(){
-  ptch.display();
-  streo.display();
-  grnRate.display();
-  grnSize.display();
-  vol.display();
-  rndm.display();
-  rev.display();
-  reset.display();
-  bg.display();
-  byHeading.display();
-  showAvg.display();
-  showOrbit.display();
-  loadSample.display();
-  rec.display();
-  tails.display();
+  for(int i = 0; i<buttons.length; i++){
+    buttons[i].display();
+  }
 }
 boolean checkButtons(){
   boolean atLeastOne = false;
@@ -248,13 +309,14 @@ boolean checkButtons(){
     atLeastOne = true;
   }
   if(byHeading.isMousedOver()){
-    colorByHeading = !colorByHeading;
-    byHeading.state = colorByHeading;
+    colorStyle++;
+    colorStyle %= 4;
+    byHeading.c = color(255/3*colorStyle,200,200);
     atLeastOne = true;
   }
   if(showOrbit.isMousedOver()){
-    showOrbitPoint = !showOrbitPoint;
-    showOrbit.state = showOrbitPoint;
+    walls = !walls;
+    showOrbit.state = walls;
     atLeastOne = true;
   }
   if(showAvg.isMousedOver()){
@@ -270,19 +332,38 @@ boolean checkButtons(){
   if(tails.isMousedOver()){
     showTails = !showTails;
     tails.state = showTails;
-    showingControls = !showTails;
+    //showingControls = !showTails;
     atLeastOne = true;
   }
   if(rec.isMousedOver()){
     if(recStarted){
       endRecording();
-      recStarted = false;
     }
     else{
-      startRecording();
-      recStarted = true;
+      if(outputPath == null){
+        selectFolder("Select a folder to record into","gotFolder");
+      }
+      else{
+        startRecording();
+      }
     }
-    rec.state = !recStarted;
+    atLeastOne = true;
+  }
+  if(resetParams.isMousedOver()){
+    resetParameters();
+    atLeastOne = true;
+  }
+  if(randomizeParams.isMousedOver()){
+    randomizeSliders();
+    atLeastOne = true;
+  }
+  if(reverbButton.isMousedOver()){
+    toggleReverb();
+    reverbButton.state = reverbing;
+    atLeastOne = true;
+  }
+  if(jumpToRandom.isMousedOver()){
+    jumpToRandomLocation();
     atLeastOne = true;
   }
   return atLeastOne;
