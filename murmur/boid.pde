@@ -184,7 +184,7 @@ class Boid{
   }
 
   //drawing the boid
-  void render(){
+  void render(String txt){
     noStroke();
     //color by c
     if(colorStyle == 0){
@@ -209,15 +209,23 @@ class Boid{
     }
     pushMatrix();
     translate(position.x,position.y,position.z);
-    PVector temp = new PVector(velocity.x,velocity.y,velocity.z);
-    temp.mult(4);
-    beginShape(TRIANGLE_STRIP);
-    vertex(-boidSize/2,0,0);
-    vertex(boidSize/2,0,0);
-    vertex(temp.x,temp.y,temp.z);
-    vertex(0,0,boidSize*3);
-    vertex(-boidSize/2,0,0);
-    endShape();
+    //debug numbers (not really useful for debugging, but it looks kinda cool
+    if(colorStyle == 4){
+      fill(c);
+      text(txt,0,0);
+    }
+    //normal arrow
+    else{
+      PVector temp = new PVector(velocity.x,velocity.y,velocity.z);
+      temp.mult(4);
+      beginShape(TRIANGLE_STRIP);
+      vertex(-boidSize/2,0,0);
+      vertex(boidSize/2,0,0);
+      vertex(temp.x,temp.y,temp.z);
+      vertex(0,0,boidSize*3);
+      vertex(-boidSize/2,0,0);
+      endShape();
+    }
     popMatrix();
   }
 }

@@ -43,8 +43,6 @@ class Button{
     }
   }
   void display(){
-    pushMatrix();
-    translate(x,y,0);
     if(state){
       fill(c);
       stroke(c);
@@ -59,86 +57,104 @@ class Button{
        stroke(c2);
       }
     }
-    if(type == 0){
-      strokeWeight(7);
-      rectMode(CENTER);
-      if(isMousedOver()){
-        rect(w/2+buttonOffset,h/2,w+4,h+4,10);
-      }
-      else{
-        rect(w/2+buttonOffset,h/2,w,h,10);
-      }
-    }
-    else if(type == 1){
-      strokeWeight(7);
-      rectMode(CENTER);
-      if(isMousedOver()){
-        rect(w/2,h/2-buttonOffset,w+4,h+4,10);
-      }
-      else{
-        rect(w/2,h/2-buttonOffset,w,h,10);
-      }
-    }
-    //rec button, since it's a circle
-    else{
-      strokeWeight(7);
-      //if it's not pressed, or if it is and it's been 500 frames
-      if(type == 4){
-        if(state || (frameCount%60)>30){
-          fill(c);
-        }
-        else{
-          fill(0,0,0,0);
-        }
-      }
-      else{
-        if(state)
-          fill(c);
-        else
-          fill(0,0,0,0);
-      }
-      if(type == 3){
+    switch(type){
+      case 0:
+        pushMatrix();
+        translate(x,y,0);
+        strokeWeight(7);
+        rectMode(CENTER);
         if(isMousedOver()){
-          ellipse(w/2-buttonOffset,h/2,w+4,h+4);
+          rect(w/2+buttonOffset,h/2,w+4,h+4,15);
         }
         else{
-          ellipse(w/2-buttonOffset,h/2,w,h);
+          rect(w/2+buttonOffset,h/2,w,h,15);
         }
-      }
-      else{
+        popMatrix();
+        break;
+      case 1:
+        pushMatrix();
+        translate(x,y,0);
+        strokeWeight(7);
+        rectMode(CENTER);
+        if(isMousedOver()){
+          rect(w/2,h/2-buttonOffset,w+4,h+4,15);
+        }
+        else{
+          rect(w/2,h/2-buttonOffset,w,h,15);
+        }
+        popMatrix();
+        break;
+      case 2:
+      //right buttons
+        pushMatrix();
+        translate(x,y,0);
+        strokeWeight(7);
         if(isMousedOver()){
           ellipse(w/2+buttonOffset,h/2,w+4,h+4);
         }
         else{
           ellipse(w/2+buttonOffset,h/2,w,h);
         }
-      }
-    }
-    popMatrix();
-    if(isMousedOver()){
-      if(c==c2)
-        fill(c);
-      else{
-        if(state){
+        popMatrix();
+        break;
+      case 3:
+      //left buttons
+        pushMatrix();
+        translate(x,y,0);
+        strokeWeight(7);
+        if(isMousedOver()){
+          rect(w/2-buttonOffset,h/2,w+4,h+4,15);
+        }
+        else{
+          rect(w/2-buttonOffset,h/2,w,h,15);
+        }
+        popMatrix();
+        break;
+      //rec button
+      case 4:
+        pushMatrix();
+        translate(x,y,0);
+        strokeWeight(7);
+        if(state || (frameCount%60)>30){
           fill(c);
         }
         else{
-          fill(c2);
+          fill(0,0,0,0);
+          noStroke();
         }
-      }
-      pushMatrix();
-      //textSize(25);
-      //side buttons
-      if(type != 1){
-        translate(x+12,510);
-        rotateZ(PI/2);
-      }
-      //top buttons
-      else{
-        translate(width-320-textWidth(txt),38);
-      }
-      //text(txt,0,0);
-      popMatrix();
+        if(isMousedOver()){
+          ellipse(w/2+buttonOffset,h/2,w+4,h+4);
+        }
+        else{
+          ellipse(w/2+buttonOffset,h/2,w,h);
+        }
+        popMatrix();
+        break;
+      //mute button
+      case 5:
+        if(!isMuted || (frameCount%60)>30){
+          if(!blackOrWhite_bg && !isMuted){
+            fill(0);
+            stroke(0);
+          }
+          pushMatrix();
+          translate(x+w/2+buttonOffset,y+h/2,0);
+          rectMode(CENTER);
+          if(isMousedOver()){
+            rotate(PI/4);
+            rect(0,0,w+4,h/4+4,4);
+            rotate(PI/2);
+            rect(0,0,w+4,h/4+4,4);
+          }
+          else{
+            rotate(PI/4);
+            rect(0,0,w,h/4,4);
+            rotate(PI/2);
+            rect(0,0,w,h/4,4);
+          }
+          popMatrix();
+        }
+        break;
     }
   }
 }
@@ -164,6 +180,8 @@ Button reverbButton;
 
 Button jumpToRandom;
 
+Button muteButton;
+
 
 Button[] buttons;
 
@@ -181,19 +199,21 @@ void makeButtons(){
   rec = new Button(width-50,560,40,40, color(222,22,29), paused, "Record",4);
   jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead",0);
   
+  muteButton = new Button(width-50,height-50,40,40,color(255,255,255), true, "Mute",5);
+  
   //display controls
   bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "Swap Background",1);
   byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "Color Style",1);
-  showOrbit = new Button(width-200,10,40,40,color(200,155,155), showOrbitPoint, "Enable Walls",1);
-  showAvg = new Button(width-250,10,40,40,color(200,55,100), showAvgPos, "Show Average",1);
-  tails = new Button(width-300,10,40,40,color(100,200,200), showAvgPos, "Toggle Screen Refresh",1);
+  showOrbit = new Button(width-200,10,40,40,color(200,200,255), walls, "Enable Walls",1);
+  showAvg = new Button(width-250,10,40,40,color(200,255,255), showAvgPos, "Show Average",1);
+  tails = new Button(width-300,10,40,40,color(255,220,0), showAvgPos, "Toggle Screen Refresh",1);
 
   //buttons for flock parameters
-  resetParams = new Button(20,height-60,40,40, color(255,200,200), true, "Reset",0);
-  randomizeParams = new Button(80,height-60,40,40, color(200,200,255), true, "Randomize Flock",0);
+  resetParams = new Button(20,height-60,40,40, color(255,200,200), true, "Reset",3);
+  randomizeParams = new Button(80,height-60,40,40, color(200,200,255), true, "Randomize Flock",3);
     
   //putting all the buttons into an array
-  buttons = new Button[19];
+  buttons = new Button[20];
   buttons[0] = reset;
   buttons[1] = ptch;
   buttons[2] = streo;
@@ -215,6 +235,7 @@ void makeButtons(){
   //buttons[18] = usingGroups;
   buttons[17] = reverbButton;
   buttons[18] = jumpToRandom;
+  buttons[19] = muteButton;
 }
 
 //resets the flock parameters
@@ -310,8 +331,8 @@ boolean checkButtons(){
   }
   if(byHeading.isMousedOver()){
     colorStyle++;
-    colorStyle %= 4;
-    byHeading.c = color(255/3*colorStyle,200,200);
+    colorStyle %= 5;
+    byHeading.c = color(255/5*colorStyle,200,200);
     atLeastOne = true;
   }
   if(showOrbit.isMousedOver()){
@@ -364,6 +385,10 @@ boolean checkButtons(){
   }
   if(jumpToRandom.isMousedOver()){
     jumpToRandomLocation();
+    atLeastOne = true;
+  }
+  if(muteButton.isMousedOver()){
+    toggleMute();
     atLeastOne = true;
   }
   return atLeastOne;

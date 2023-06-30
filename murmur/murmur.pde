@@ -66,32 +66,70 @@ boolean gRandom = true;
 boolean reverse = true;
 boolean reverbing = false;
 
+boolean isMuted = false;
+
 boolean secondWindowOpen = false;
 ChildApplet childWindow;
 
+PShape logo;
 //array of boids (holding all the boids)
 Boid[] flock;
 
+void drawLogo(){
+  //logo
+  pushMatrix();
+  translate(logo.height/2-40,logo.width/2-40);
+  rotateZ(-PI/2);
+  colorMode(HSB,400);
+  noStroke();
+  if(blackOrWhite_bg){
+    fill(155);
+    shape(logo,0,-buttonOffset);
+  }
+  else{
+    fill(155);
+    shape(logo,0,-buttonOffset);
+  }
+  colorMode(RGB,255);
+  popMatrix();
+}
+
 void setup(){
+  //init canvas
   size(1000,1000,P3D);
   background(0);
-  //drop = new SDrop(this);
+  
+  logo = loadShape("logo/murmur_logo_transparent.svg");
+  logo.disableStyle();
+  logo.scale(0.4);
+  //black_logo.setStroke(255);
+  //white_logo.disableStyle();
+  //black_logo.enableStyle();
+  
+  //grabbing mp3 and setting the rec count
   filename = dataPath("samples/"+filename);
   numberOfRecordings = 0;
+  
   avgVel = new PVector(0,0,0);
   avgPos = new PVector(0,0,0);
+  
   //allocate memory for the flock
   flock = new Boid[numberOfBoids];
+  
   //initialize the flock with boid objects
   for(int i = 0; i<flock.length; i++){
     flock[i] = new Boid();
   }
+  
+  //loading controls
   makeButtons();
   makeSliders();
 
+  //starting audio
   startplayer();
   //just so the orb starts w/ the boids
   getData();
+  
 }
 
 void drawPause(){
@@ -289,7 +327,7 @@ void drawSubGroups(Group g){
   for(int i = 0; i<g.homies.size(); i++){
     color tempC = g.homies.get(i).c;
     g.homies.get(i).c = g.c;
-    g.homies.get(i).render();
+    g.homies.get(i).render("hey");
     g.homies.get(i).c = tempC;
   }
   //fill(g.c);
@@ -326,6 +364,7 @@ void draw(){
     else
       background(255);
   }
+  drawLogo();
   for(int i = 0; i<flock.length; i++){
     if(!paused){
       //updating physics of each boid
@@ -337,7 +376,7 @@ void draw(){
       flock[i].updateLocation();
     }
     //drawing each boid
-    flock[i].render();
+    flock[i].render(str(i));
   }
   if(!paused){
     updateGrains();
@@ -369,6 +408,7 @@ void draw(){
   }
   if(walls)
     drawWalls();
+  
 }
 
 void mousePressed(){
