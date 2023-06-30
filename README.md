@@ -1,4 +1,5 @@
 # murmur
+![Murmur Logo](/resources/images/logo.svg)
  "a soft, indistinct sound made by a person or group of people speaking quietly or at a distance."
  
  Murmur is a digital instrument built around collective flocking behavior. It gets its name from "murmuration"-- a group of starlings flocking together.
