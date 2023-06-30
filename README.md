@@ -1,14 +1,22 @@
-# murmur
-![Murmur Logo](/resources/images/murmur_logo.svg)
- "a soft, indistinct sound made by a person or group of people speaking quietly or at a distance."
+<p align="center">
+  <img src="https://github.com/alexlafetra/murmur/blob/main/resources/images/murmur_logo.svg" />
+</p>
  
- Murmur is a digital instrument built around collective flocking behavior. It gets its name from "murmuration"-- a group of starlings flocking together.
  
-Within murmur, a community of simulated birds continually update the parameters of a granular sampler engine, synthesizing and recording sound from an audio sample that you feed it.
+ <p align = "center">
+  "a soft, indistinct sound made by a person or group of people speaking quietly or at a distance."
+ </p>
+
+
  
- Murmur is being written in Java and is built using [Processing](https://processing.org/) (which I literally cannot recommend enough). It uses the [Beads](http://www.beadsproject.net/) library to work with audio files and to mess with granular audio synthesis. Feel free to reuse, unmake, or change any of murmur's code -- just don't sell it. Please drop me a line if you make something with it so I can check it out.
+ Murmur is a digital instrument built around collective flocking behavior. It gets its name from "murmuration"-- a group of starlings flocking together, and from the concept of many voices speaking indistinctly.
+
+ ![An image of murmur in-action](/resources/images/img1_header.png)
+
+Murmur is a statistical engine that runs a simulation of a community of "birds" and updates the parameters of a granular synthesizer with data from the flock.
+Murmur doesn't make sound on its own--you need to feed it a sound it can digest and resample.
  
-  ![An image of murmur in-action](/resources/images/img1_header.png)
+ Murmur is written in Java using [Processing](https://processing.org/). It uses the [Beads](http://www.beadsproject.net/) library to work with audio files and to mess with granular audio synthesis. The logic behind the flocking sim is heavily inspired  from Craig Reynold's original 1986 ["Boids"](https://www.red3d.com/cwr/boids/) algorithm, implemented in Murmur in 3D with 3000 birds. Reynold's website has a great description of the mathematics and the biological significant of the algorithm, and it does a really great job of creating unexpected and rule-based chaos in a musical system.
  
  # Instructions
  ## Running the Application
@@ -54,7 +62,5 @@ Buttons along the top of the screen control murmur's visual appearance. From lef
 - show the orbit radius around the cursor.
 - color each bird by its unique color, or by its velocity vector. Velocity by default, which *usually* helps visually highlight the subflocks within the group.
 - toggle between a black and white background, *_night mode baby_*.
-
-The logic behind the flocking sim is stolen directly from [Craig Reynold's 1986 "Boids" algorithm](https://www.red3d.com/cwr/boids/). Reynold's website has a great description of the mathematics and the biological significant of the algorithm, and it does a really great job of creating unexpected and rule-based chaos in a musical system.
  
  ![A Pretty Pic](/resources/images/img2_header.png)
