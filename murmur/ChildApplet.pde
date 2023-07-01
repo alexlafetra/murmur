@@ -3,7 +3,6 @@ class ChildApplet extends PApplet{
   int tint;
   float x,y;
   SDrop drop;
-  PShape smallLogo;
   public ChildApplet(float x1, float y1){
     super();
     this.x = x1;

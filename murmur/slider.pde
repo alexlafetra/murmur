@@ -130,7 +130,7 @@ Slider groupHeadingToleranceSlider;
 
 Slider[] sliders;
 void makeSliders(){
-  volumeSlider = new Slider(width-30,890,30,200,0,10,7,"Volume",0);
+  volumeSlider = new Slider(width-30,840,30,200,0,10,7,"Volume",0);
   volumeSlider.textType = 1;
   
   //playbackSpeedSlider = new Slider(width-60,890,30,200,0,2,1,"Playback Speed",0);
@@ -209,7 +209,9 @@ void moveSliders(){
       }
     }
   }
-  masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
+  //if it's not muted
+  if(!isMuted)
+    masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
   avoidanceModifier = avoidanceSlider.max-avoidanceSlider.currentVal;
   cohesionModifier = cohesionSlider.max-cohesionSlider.currentVal;
   orientationModifier = orientationSlider.max-orientationSlider.currentVal;

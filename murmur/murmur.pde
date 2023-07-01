@@ -11,6 +11,8 @@ general it sounds less choppy and looks like it sways with the shape of the floc
 String filename = "test3_chopin.mp3";
 String outputPath = null;
 String buttonText;
+
+String website = "https://alexlafetra.github.io/projects/murmur/murmur.html";
 //parameters for the flock sim
 
 //number of birds
@@ -80,56 +82,36 @@ void drawLogo(){
   pushMatrix();
   translate(logo.height/2-40,logo.width/2-40);
   rotateZ(-PI/2);
-  colorMode(HSB,400);
   noStroke();
+  boolean highlight = false;
+  if(isOverLogo()){
+    highlight = true;
+    buttonText = "Info";
+  }
   if(blackOrWhite_bg){
-    fill(155);
-    shape(logo,0,-buttonOffset);
+    if(highlight)
+      fill(250);
+    else
+      fill(100);
   }
   else{
-    fill(155);
-    shape(logo,0,-buttonOffset);
+    if(highlight)
+      fill(100);
+    else
+      fill(250);
   }
-  colorMode(RGB,255);
+  shape(logo,0,-buttonOffset);
   popMatrix();
 }
 
-void setup(){
-  //init canvas
-  size(1000,1000,P3D);
-  background(0);
-  
-  logo = loadShape("logo/murmur_logo_transparent.svg");
-  logo.disableStyle();
-  logo.scale(0.4);
-  //black_logo.setStroke(255);
-  //white_logo.disableStyle();
-  //black_logo.enableStyle();
-  
-  //grabbing mp3 and setting the rec count
-  filename = dataPath("samples/"+filename);
-  numberOfRecordings = 0;
-  
-  avgVel = new PVector(0,0,0);
-  avgPos = new PVector(0,0,0);
-  
-  //allocate memory for the flock
-  flock = new Boid[numberOfBoids];
-  
-  //initialize the flock with boid objects
-  for(int i = 0; i<flock.length; i++){
-    flock[i] = new Boid();
+boolean isOverLogo(){
+  if(mouseX>(20) && mouseX<(40+logo.height*0.4) && mouseY>(20-buttonOffset) && mouseY < (20-buttonOffset+logo.width*0.4)){
+    cursor(HAND);
+    return true;
   }
-  
-  //loading controls
-  makeButtons();
-  makeSliders();
-
-  //starting audio
-  startplayer();
-  //just so the orb starts w/ the boids
-  getData();
-  
+  else{
+    return false;
+  }
 }
 
 void drawPause(){
@@ -229,6 +211,19 @@ boolean isValidAudioFileType(String s){
   }
 }
 
+String getFormattedFileName(){
+  String text = "";
+  //step back thru string until you find a "/"
+  for(int i = filename.length()-1; i>=0; i--){
+    if(filename.charAt(i) == '/'){
+      text = filename.substring(i+1);
+      return text;
+    }
+  }
+  text = "Feed me an MP3/WAV pls";
+  return text;
+}
+
 //getting x/y coord of screen
 PVector getLocationOnScreen(){
   PVector location = new PVector();
@@ -236,179 +231,6 @@ PVector getLocationOnScreen(){
   com.jogamp.nativewindow.util.Point point = window.getLocationOnScreen(new com.jogamp.nativewindow.util.Point());
   location.set(point.getX(),point.getY());
   return location;
-}
-
-//stores a group of boids at a certain heading and location
-class Group{
-  PVector heading;
-  PVector location;
-  ArrayList<Boid> homies;
-  color c;
-  public Group(Boid b){
-    heading = b.velocity;
-    location = b.position;
-    homies = new ArrayList<Boid>();
-    homies.add(b);
-    c = b.c;
-  }
-}
-
-float headingTolerance = 10;
-int positionTolerance = 100;
-ArrayList<Group>groups;
-boolean createGroups = false;
-boolean averageGroupData = false;
-boolean updateWithinGroups = false;
-
-void updateGroups(){
-  groups = new ArrayList<Group>();
-  Group firstGroup = new Group(flock[0]);
-  groups.add(firstGroup);
-  //println("making groups...");
-  for(int i = 1; i<flock.length; i++){
-    boolean foundGroup = false;
-    for(int j = 0; j<groups.size(); j++){
-      PVector differenceInPos = PVector.sub(flock[i].position,groups.get(j).location);
-      float differenceInHeading = PVector.angleBetween(flock[i].velocity,groups.get(j).heading);
-      //if the boid is in the group, add it
-      if(differenceInPos.mag() < positionTolerance && abs(differenceInHeading)<headingTolerance){
-        //add boid
-        groups.get(j).homies.add(flock[i]);
-        
-        if(averageGroupData){
-        //average the group position
-          groups.get(j).location = PVector.add(flock[i].position,groups.get(j).location);
-          groups.get(j).location.div(2);
-        //average the group heading
-          groups.get(j).heading= PVector.add(flock[i].velocity,groups.get(j).heading);
-          groups.get(j).heading.div(2);
-        }
-        foundGroup = true;
-        break;
-      }
-    }
-    //if the bird doesn't fit in to any of the groups, make a new group with the boid in it and add it to the list
-    if(!foundGroup){
-      //println("making new group");
-      Group newGroup = new Group(flock[i]);
-      groups.add(newGroup);
-    }
-  }
-  //println("number of groups:" + str(groups.size()));
-  //go thru each group and update the boids in it
-  float tempDiff = 0;
-  for(int i = 0; i<groups.size(); i++){
-    if(updateWithinGroups){
-      avgDiff_Position = 0;
-      updatePhysicsOfGroup(groups.get(i));
-      tempDiff += avgDiff_Position;
-      tempDiff = tempDiff/groups.get(i).homies.size();
-    }
-    //println(groups.get(i).homies.size());
-      
-    //drawing a group if it's more than just one boid
-    //if(groups.get(i).homies.size()>1)
-    drawSubGroups(groups.get(i));
-  }
-  avgDiff_Position = (tempDiff/groups.size());
-  //sampleList.update();
-}
-
-void updatePhysicsOfGroup(Group g){
-  for(int i = 0; i<g.homies.size(); i++){
-    Boid[] tempArray = new Boid[g.homies.size()];
-    tempArray = g.homies.toArray(tempArray);
-    g.homies.get(i).updatePhysics(tempArray);
-  }
-}
-
-void drawSubGroups(Group g){
-  //color groupColor = color(random(0,255),random(0,255),random(0,255));
-  for(int i = 0; i<g.homies.size(); i++){
-    color tempC = g.homies.get(i).c;
-    g.homies.get(i).c = g.c;
-    g.homies.get(i).render("hey");
-    g.homies.get(i).c = tempC;
-  }
-  //fill(g.c);
-  stroke(g.c);
-  noFill();
-  if(g.homies.size()>1){
-    pushMatrix();
-    //ellipse(g.location.x,g.location.y,g.homies.size(),g.homies.size());
-    translate(g.location.x,g.location.y,g.location.z);
-    sphere(map(g.homies.size(),0,flock.length,0,200));
-    popMatrix();
-  }
-}
-
-void draw(){
-  //println(avgDiff_Position);
-  //NEEDS to be initialized within draw!
-  /*
-  not sure why. running multiple PApplets with different renderers is really buggy,
-  my guess is it has something to do with when "settings" is run.
-  initializing the object here seems to force all the 'setup' for the main applet to take place first,
-  THEN canvas() the second one
-  */
-  if(!secondWindowOpen){
-    PVector loc = getLocationOnScreen();
-    childWindow = new ChildApplet(loc.x+1000,loc.y-53);
-    secondWindowOpen = true;
-  }
-  updateOrbitPoint();
-  //clear background
-  if(!showTails){
-    if(blackOrWhite_bg)
-      background(0);
-    else
-      background(255);
-  }
-  drawLogo();
-  for(int i = 0; i<flock.length; i++){
-    if(!paused){
-      //updating physics of each boid
-      //buffer[i].updatePhysics(flock);
-      avgDiff_Position = 0;
-      flock[i].updatePhysics(flock);
-      avgDiff_Position/=flock.length;
-      //updating location of each boid
-      flock[i].updateLocation();
-    }
-    //drawing each boid
-    flock[i].render(str(i));
-  }
-  if(!paused){
-    updateGrains();
-  }
-  else{
-    drawPause();
-  }
-  drawAvgData();
-   
-  noFill();
-  stroke(255);  
-  cursor(ARROW);
-  //if the controls are being shown
-  if(showingControls){
-    displayButtons();
-    displaySliders();
-    moveSliders();
-    if(buttonOffset>0){
-      buttonOffset-=10;
-    }
-  }
-  else{
-    if(buttonOffset<120){
-
-      displayButtons();
-      displaySliders();
-      buttonOffset+=10;
-    }
-  }
-  if(walls)
-    drawWalls();
-  
 }
 
 void mousePressed(){
@@ -419,7 +241,10 @@ void mousePressed(){
       anyInteractions = true;
     if(clickSliders())
       anyInteractions = true;
-      
+    if(isOverLogo()){
+      anyInteractions = true;
+      link(website);
+    }
     //if there are no button presses/slider grabs, toggle pause
     if(!anyInteractions)
       paused = !paused;
@@ -448,15 +273,108 @@ void keyPressed(){
     showingControls = !showingControls;
   }
 }
-String getFormattedFileName(){
-  String text = "";
-  //step back thru string until you find a "/"
-  for(int i = filename.length()-1; i>=0; i--){
-    if(filename.charAt(i) == '/'){
-      text = filename.substring(i+1);
-      return text;
+
+
+void setup(){
+  //init canvas
+  size(1000,1000,P3D);
+  background(0);
+  
+  logo = loadShape("logo/murmur_logo_transparent.svg");
+  logo.disableStyle();
+  logo.scale(0.4);
+  //black_logo.setStroke(255);
+  //white_logo.disableStyle();
+  //black_logo.enableStyle();
+  
+  //grabbing mp3 and setting the rec count
+  filename = dataPath("samples/"+filename);
+  numberOfRecordings = 0;
+  
+  avgVel = new PVector(0,0,0);
+  avgPos = new PVector(0,0,0);
+  
+  //allocate memory for the flock
+  flock = new Boid[numberOfBoids];
+  
+  //initialize the flock with boid objects
+  for(int i = 0; i<flock.length; i++){
+    flock[i] = new Boid();
+  }
+  
+  //loading controls
+  makeButtons();
+  makeSliders();
+
+  //starting audio
+  startplayer();
+  //just so the orb starts w/ the boids
+  getData();
+}
+
+void draw(){
+  //println(avgDiff_Position);
+  //NEEDS to be initialized within draw!
+  /*
+  not sure why. running multiple PApplets with different renderers is really buggy,
+  my guess is it has something to do with when "settings" is run.
+  initializing the object here seems to force all the 'setup' for the main applet to take place first,
+  THEN canvas() the second one
+  */
+  if(!secondWindowOpen){
+    PVector loc = getLocationOnScreen();
+    childWindow = new ChildApplet(loc.x+1000,loc.y-53);
+    secondWindowOpen = true;
+  }
+  updateOrbitPoint();
+  //clear background
+  if(!showTails){
+    if(blackOrWhite_bg)
+      background(0);
+    else
+      background(255);
+  }
+  for(int i = 0; i<flock.length; i++){
+    if(!paused){
+      //updating physics of each boid
+      //buffer[i].updatePhysics(flock);
+      avgDiff_Position = 0;
+      flock[i].updatePhysics(flock);
+      avgDiff_Position/=flock.length;
+      //updating location of each boid
+      flock[i].updateLocation();
+    }
+    //drawing each boid
+    flock[i].render(str(i));
+  }
+  
+  if(!paused){
+    updateGrains();
+  }
+  else{
+    drawPause();
+  }
+  drawAvgData();
+   
+  noFill();
+  stroke(255);  
+  cursor(ARROW);
+    
+  displayButtons();
+  displaySliders();
+  drawLogo();
+  //if the controls are being shown
+  if(showingControls){
+    moveSliders();
+    if(buttonOffset>0){
+      buttonOffset-=10;
     }
   }
-  text = "Feed me an MP3/WAV pls";
-  return text;
+  else{
+    if(buttonOffset<120){
+      buttonOffset+=10;
+    }
+  }
+  if(walls)
+    drawWalls();
 }

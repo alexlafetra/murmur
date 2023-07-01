@@ -157,6 +157,19 @@ void toggleReverb(){
   reverbing = !reverbing;
   reverb.pause(!reverbing);
 }
+
+void toggleMute(){
+  isMuted = !isMuted;
+  if(isMuted){
+    masterGain.setGain(0);
+    muteButton.c = color(255,0,0);
+  }
+  else{
+    masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
+    muteButton.c = color(255,255,255);
+  }
+}
+
 void updateGrains(){
   if(!paused){
     getData();

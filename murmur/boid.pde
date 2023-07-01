@@ -224,6 +224,7 @@ class Boid{
       vertex(temp.x,temp.y,temp.z);
       vertex(0,0,boidSize*3);
       vertex(-boidSize/2,0,0);
+      //emissive(300);
       endShape();
     }
     popMatrix();
