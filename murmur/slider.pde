@@ -37,14 +37,20 @@ class Slider{
     //for right-set sliders
     if(type == 0)
       translate(x+buttonOffset,y);
-    //for left-set sliders
+    //for top-set sliders
     else if(type == 1)
-      translate(x-buttonOffset,y);
-    //for horizontal sliders
+      translate(x,y-buttonOffset);
+    //for horizontal L sliders
     else if(type == -1){
       translate(x-buttonOffset,y);
       rotate(radians(90));
     }
+    //for horizontal R sliders
+    else if(type == -2){
+      translate(x+buttonOffset,y);
+      rotate(radians(90));
+    }
+      
     noStroke();
     //fill based on background color
     color c;
@@ -52,6 +58,7 @@ class Slider{
       c = color(map(currentVal,min,max,red(c2),red(c1)),map(currentVal,min,max,green(c2),green(c1)),map(currentVal,min,max,blue(c2),blue(c1)));
     }
     else{
+      //println(brightness(backgroundColor));
       c = blackOrWhite_bg ? color(255,255,255):color(0,0,0);
     }
     fill(c);
@@ -71,16 +78,14 @@ class Slider{
     textAlign(CENTER);
     //drawing title text
     if(isGrabbed()){
-      buttonText = txt;
+      childWindow.text = txt;
     }
     //if it's being moved, draw the current val
     if(isBeingMoved){
       if(textType == 1)
-        buttonText = str(round(100-100*currentVal/max))+"%";
-        //text(str(round(100-100*currentVal/max))+"%",0,-h/2-10);
+        childWindow.text = str(round(100-100*currentVal/max))+"%";
       else
-        //text(max-currentVal,0,-h/2-10);
-        buttonText = str(max-currentVal);
+        childWindow.text = str(max-currentVal);
     }
     popMatrix();
     textAlign(LEFT);
@@ -128,13 +133,34 @@ Slider playbackSpeedSlider;
 Slider groupPositionToleranceSlider;
 Slider groupHeadingToleranceSlider;
 
+Slider boidSlider;
+
+Slider rSlider,gSlider,bSlider;
+
 Slider[] sliders;
 void makeSliders(){
   volumeSlider = new Slider(width-30,840,30,200,0,10,7,"Volume",0);
   volumeSlider.textType = 1;
   
-  //playbackSpeedSlider = new Slider(width-60,890,30,200,0,2,1,"Playback Speed",0);
-  //playbackSpeedSlider.textType = 1;
+  rSlider = new Slider(width-30,640,20,40,0,255,255,"color - red",-2);
+  gSlider = new Slider(width-30,665,20,40,0,255,255,"color - green",-2);
+  bSlider = new Slider(width-30,690,20,40,0,255,255,"color - blue",-2);
+  
+  rSlider.colorByVal = true;
+  rSlider.c1 = color(255,255,255);
+  rSlider.c2 = color(255,0,0);
+  gSlider.colorByVal = true;
+  gSlider.c1 = color(255,255,255);
+  gSlider.c2 = color(0,255,0);
+  bSlider.colorByVal = true;
+  bSlider.c1 = color(255,255);
+  bSlider.c2 = color(0,0,255);
+  
+  
+  boidSlider = new Slider(70,height-460,30,100,1,2000,2000-numberOfBoids,"Number of Boids",-1);
+  boidSlider.colorByVal = true;
+  boidSlider.c1 = color(0,200,200);
+  boidSlider.c2 = color(255,200,255);
   
   cohesionSlider = new Slider(70,height-400,30,100,0,5,5-1.1,"Cohesion",-1);
   cohesionSlider.colorByVal = true;
@@ -170,7 +196,7 @@ void makeSliders(){
   //groupPositionToleranceSlider = new Slider(70,550,30,100,0,1000,1000-100,"Position Tolerance",-1);
   //groupHeadingToleranceSlider = new Slider(70,610,30,100,0,360,270,"Heading Tolerance",-1);
   
-  sliders = new Slider[7];
+  sliders = new Slider[11];
   sliders[0] = volumeSlider;
   sliders[1] = avoidanceSlider;
   sliders[2] = cohesionSlider;
@@ -178,7 +204,11 @@ void makeSliders(){
   sliders[4] = randomSlider;
   sliders[5] = orbitSlider;
   sliders[6] = perceptionSlider;
-  //sliders[7] = playbackSpeedSlider;
+  sliders[7] = boidSlider;
+  sliders[8] = rSlider;
+  sliders[9] = gSlider;
+  sliders[10] = bSlider;
+
 }
 void displaySliders(){
   for(int i = 0; i<sliders.length; i++){
@@ -209,6 +239,7 @@ void moveSliders(){
       }
     }
   }
+  
   //if it's not muted
   if(!isMuted)
     masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
@@ -218,6 +249,15 @@ void moveSliders(){
   randomModifier = randomSlider.max-randomSlider.currentVal;
   orbitR = orbitSlider.max - orbitSlider.currentVal;
   perceptionR = perceptionSlider.max - perceptionSlider.currentVal;
+  
+  checkBoidCount();
+  backgroundColor = color(rSlider.max-rSlider.currentVal,gSlider.max-gSlider.currentVal,bSlider.max-bSlider.currentVal);
+  if(red(backgroundColor)>180&&green(backgroundColor)>180&&blue(backgroundColor)>180){
+    blackOrWhite_bg = false;
+  }
+  else{
+    blackOrWhite_bg = true;
+  }
 }
 
 void releaseSliders(){
@@ -227,8 +267,9 @@ void releaseSliders(){
 }
 
 void randomizeSliders(){
-  //starting at 1 so you skip the volume slider
-  for(int i = 1; i<sliders.length; i++){
+  //starting at 1 so you skip the volume slider, and end before the color sliders
+  for(int i = 1; i<sliders.length-3; i++){
     sliders[i].randomize();
   }
+  checkBoidCount();
 }

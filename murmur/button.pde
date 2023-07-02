@@ -6,11 +6,11 @@ class Button{
   int h;
   boolean state;
   String txt;
-  int type;
+  String type;
   //boolean clickFlag;
   color c;
   color c2;
-  Button(int xPos, int yPos, int wth, int ht, color a, boolean s, String t, int pl){
+  Button(int xPos, int yPos, int wth, int ht, color a, boolean s, String t, String ty){
     x = xPos;
     y = yPos;
     w = wth;
@@ -19,9 +19,9 @@ class Button{
     c2 = a;
     state = s;
     txt = t;
-    type = pl;
+    type = ty;
   }
-  Button(int xPos, int yPos, int wth, int ht, color a, color b, boolean s, String t, int pl){
+  Button(int xPos, int yPos, int wth, int ht, color a, color b, boolean s, String t, String ty){
     x = xPos;
     y = yPos;
     w = wth;
@@ -30,12 +30,12 @@ class Button{
     c2 = b;
     state = s;
     txt = t;
-    type = pl;
+    type = ty;
   }
   Boolean isMousedOver(){
     if(mouseX>=x && mouseX<= x+w && mouseY>=y && mouseY<=y+h){
       cursor(HAND);
-      buttonText = txt;
+      childWindow.text = txt;
       return true;
     }
     else{
@@ -58,7 +58,7 @@ class Button{
       }
     }
     switch(type){
-      case 0:
+      case "RIGHT_SQUARE":
         pushMatrix();
         translate(x,y,0);
         strokeWeight(7);
@@ -71,7 +71,7 @@ class Button{
         }
         popMatrix();
         break;
-      case 1:
+      case "TOP_SQUARE":
         pushMatrix();
         translate(x,y,0);
         strokeWeight(7);
@@ -84,7 +84,7 @@ class Button{
         }
         popMatrix();
         break;
-      case 2:
+      case "RIGHT_ROUND":
       //right buttons
         pushMatrix();
         translate(x,y,0);
@@ -97,7 +97,7 @@ class Button{
         }
         popMatrix();
         break;
-      case 3:
+      case "LEFT_SQUARE":
       //left buttons
         pushMatrix();
         translate(x,y,0);
@@ -111,7 +111,7 @@ class Button{
         popMatrix();
         break;
       //rec button
-      case 4:
+      case "REC":
         pushMatrix();
         translate(x,y,0);
         strokeWeight(7);
@@ -131,9 +131,9 @@ class Button{
         popMatrix();
         break;
       //mute button
-      case 5:
+      case "MUTE":
         if(!isMuted || (frameCount%60)>30){
-          if(!blackOrWhite_bg && !isMuted){
+          if(!(blackOrWhite_bg) && !isMuted){
             fill(0);
             stroke(0);
           }
@@ -186,31 +186,31 @@ Button muteButton;
 Button[] buttons;
 
 void makeButtons(){
-  reset = new Button(width-50,10,40,40, color(255,50,50), true, "Reset",1);
-  ptch = new Button(width-50,60,40,40, color(0,233,28), pitch, "Pitch",0);
-  streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "Pan",0);
-  grnRate = new Button(width-50,160,40,40, color(150,150,200), gRate, "Grain Rate",0);
-  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "Grain Size",0);
-  vol = new Button(width-50,260,40,40, color(200,55,100), gain, "Gain",0);
-  rndm = new Button(width-50,310,40,40, color(255,200,200), gRandom, "Noise",0);
-  rev = new Button(width-50,360,40,40, color(200,100,255), paused, "Direction",0);
-  reverbButton = new Button(width-50,410,40,40, color(200,200,255), reverbing, "Reverb",0);
-  loadSample = new Button(width-50,460,40,40,color(255,150,50), true, "Load New Sample",0);
-  rec = new Button(width-50,560,40,40, color(222,22,29), paused, "Record",4);
-  jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead",0);
+  reset = new Button(width-50,10,40,40, color(255,50,50), true, "Reset","RIGHT_SQUARE");
+  ptch = new Button(width-50,60,40,40, color(0,233,28), pitch, "Pitch","RIGHT_SQUARE");
+  streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "Pan","RIGHT_SQUARE");
+  grnRate = new Button(width-50,160,40,40, color(150,150,200), gRate, "Grain Rate","RIGHT_SQUARE");
+  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "Grain Size","RIGHT_SQUARE");
+  vol = new Button(width-50,260,40,40, color(200,55,100), gain, "Gain","RIGHT_SQUARE");
+  rndm = new Button(width-50,310,40,40, color(255,200,200), gRandom, "Noise","RIGHT_SQUARE");
+  rev = new Button(width-50,360,40,40, color(200,100,255), paused, "Direction","RIGHT_SQUARE");
+  reverbButton = new Button(width-50,410,40,40, color(200,200,255), reverbing, "Reverb","RIGHT_SQUARE");
+  loadSample = new Button(width-50,460,40,40,color(255,150,50), true, "Load New Sample","RIGHT_SQUARE");
+  rec = new Button(width-50,560,40,40, color(222,22,29), paused, "Record","REC");
+  jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead","RIGHT_SQUARE");
   
-  muteButton = new Button(width-50,height-50,40,40,color(255,255,255), true, "Mute",5);
+  muteButton = new Button(width-50,height-50,40,40,color(255,255,255), true, "Mute","MUTE");
   
   //display controls
-  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "Swap Background",1);
-  byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "Color Style",1);
-  showOrbit = new Button(width-200,10,40,40,color(200,200,255), walls, "Enable Walls",1);
-  showAvg = new Button(width-250,10,40,40,color(200,255,255), showAvgPos, "Show Average",1);
-  tails = new Button(width-300,10,40,40,color(255,220,0), showAvgPos, "Toggle Screen Refresh",1);
+  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "Swap Background","TOP_SQUARE");
+  byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "Color Style","TOP_SQUARE");
+  showOrbit = new Button(width-200,10,40,40,color(200,200,255), walls, "Enable Walls","TOP_SQUARE");
+  showAvg = new Button(width-250,10,40,40,color(200,255,255), showAvgPos, "Show Average","TOP_SQUARE");
+  tails = new Button(width-300,10,40,40,color(255,220,0), updateScreen, "Toggle Screen Refresh","TOP_SQUARE");
 
   //buttons for flock parameters
-  resetParams = new Button(20,height-60,40,40, color(255,200,200), true, "Reset",3);
-  randomizeParams = new Button(80,height-60,40,40, color(200,200,255), true, "Randomize Flock",3);
+  resetParams = new Button(20,height-60,40,40, color(255,200,200), true, "Reset","LEFT_SQUARE");
+  randomizeParams = new Button(80,height-60,40,40, color(200,200,255), true, "Randomize Flock","LEFT_SQUARE");
     
   //putting all the buttons into an array
   buttons = new Button[20];
@@ -240,16 +240,17 @@ void makeButtons(){
 
 //resets the flock parameters
 void resetParameters(){
-  avoidanceModifier = 1.5;
-  cohesionModifier = 1.1;
-  orientationModifier = 1.2;
-  randomModifier = 1;
-  perceptionR = 50;
-  orbitR = 300;
-  makeSliders();
+  avoidanceSlider.currentVal = avoidanceSlider.max-1.5;
+  cohesionSlider.currentVal = cohesionSlider.max-1.1;
+  orientationSlider.currentVal = orientationSlider.max-1.2;
+  randomSlider.currentVal = randomSlider.max-1;
+  orbitSlider.currentVal = orbitSlider.max-300;
+  perceptionSlider.currentVal = perceptionSlider.max-50;
+  boidSlider.currentVal = boidSlider.max-numberOfBoids;
+  checkBoidCount();
 }
-// Java program to demonstrate working of
-// Math.random() to generate random numbers
+
+//need this to get the Math.random() function
 import java.util.*;
    
 void jumpToRandomLocation(){
@@ -276,6 +277,11 @@ void reset(){
   //just so the orb starts w/ the boids
   getData();
   masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
+  
+  backgroundColor = color(0,0,0);
+  rSlider.currentVal = 255;
+  gSlider.currentVal = 255;
+  bSlider.currentVal = 255;
 }
 
 void displayButtons(){
@@ -326,6 +332,21 @@ boolean checkButtons(){
   }
   if(bg.isMousedOver()){
     blackOrWhite_bg = !blackOrWhite_bg;
+    if(blackOrWhite_bg){
+      backgroundColor = color(0,0,0);
+      rSlider.currentVal = 255;
+      gSlider.currentVal = 255;
+      bSlider.currentVal = 255;
+    }
+    else{
+      backgroundColor = color(255,255,255);
+      rSlider.currentVal = 0;
+      gSlider.currentVal = 0;
+      bSlider.currentVal = 0;
+    }
+    flockGraphics.beginDraw();
+    flockGraphics.background(backgroundColor);
+    flockGraphics.endDraw();
     bg.state = blackOrWhite_bg;
     atLeastOne = true;
   }
@@ -351,9 +372,8 @@ boolean checkButtons(){
     atLeastOne = true;
   }
   if(tails.isMousedOver()){
-    showTails = !showTails;
-    tails.state = showTails;
-    //showingControls = !showTails;
+    updateScreen = !updateScreen;
+    tails.state = updateScreen;
     atLeastOne = true;
   }
   if(rec.isMousedOver()){

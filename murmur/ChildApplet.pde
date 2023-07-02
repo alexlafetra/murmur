@@ -3,6 +3,7 @@ class ChildApplet extends PApplet{
   int tint;
   float x,y;
   SDrop drop;
+  String text;
   public ChildApplet(float x1, float y1){
     super();
     this.x = x1;
@@ -22,6 +23,7 @@ class ChildApplet extends PApplet{
     drop = new SDrop(this);
     this.textSize(40);
     this.textAlign(CENTER);
+    textFont(garamond,48);
   }
   public void drawSound(){
     this.loadPixels();
@@ -41,12 +43,15 @@ class ChildApplet extends PApplet{
     }
     this.updatePixels();
   }
+  public void kill(){
+  }
   public void draw() {
     //background(frameCount%400,tint,tint);
     windowTitle(getFormattedFileName());
+    //windowTitle("feed me an mp3 <3");
     drawSound();
-    if(buttonText != null){
-      this.text(buttonText,this.width/2,this.height/2);
+    if(this.text != null){
+      this.text(this.text.toLowerCase(),this.width/2,this.height/2+8);
     }
   }
   //when a file is dropped on the window

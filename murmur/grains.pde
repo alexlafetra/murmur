@@ -176,8 +176,6 @@ void updateGrains(){
   }
   float vel = avgVel.mag();
   PVector xyHeading = new PVector(avgVel.x,avgVel.y);
-  float distanceToOrbit = PVector.dist(orbitPoint,avgPos);
- 
   if(reverse){
     if(xyHeading.heading()>PI/2){
        player.setLoopType(SamplePlayer.LoopType.LOOP_FORWARDS);
@@ -189,10 +187,8 @@ void updateGrains(){
   else{
    player.setLoopType(SamplePlayer.LoopType.LOOP_FORWARDS);
   }
-
-  //blurs out sample when birds get farther away
+  //blurs out sample when birds get less aligned
   if(gRandom){
-    //randomness.setValue(distanceToOrbit/10000);
     randomness.setValue(headingVariance/300);
   }
   else{
@@ -216,21 +212,18 @@ void updateGrains(){
     grainSize.setValue(0.1);
   }
   if(gRate){
-    //grainRate.setValue(vel/1000);
-    grainRate.setValue(1/map(headingVariance,0,60,0,10));
-    //grainRate.setValue(10/pow(headingVariance,3));
-    //grainRate.setValue(avgDiff_Position/500);
+    grainRate.setValue(1/map(headingVariance,0,60,0.1,40));
   }
   else{
     grainRate.setValue(0);
   }
   if(gain){
     gainGlide.setValue(map(vel,-maxSpeed/2,maxSpeed,0,0.1));
-    //g.setGain(1-map(vel,-maxSpeed,maxSpeed,0,1));
+    g.setGain(gainGlide);
   }
   else{
-    //g.setGain(0.1);
     gainGlide.setValue(0.1);
+    g.setGain(gainGlide);
   }
   if(stereo){
     pan.setPos(map(avgPos.x,-width,3*width/2,-1,1));
@@ -239,10 +232,9 @@ void updateGrains(){
     pan.setPos(0);
   }
   if(reverbing){
-    //reverb.setSize(map(avgDiff_Position,100,400,0,1));
-    //averageing so you don't get as many reverb clicks
-    reverb.setSize(reverb.getSize()+(map(avgDiff_Position,0,1000,0,1)-reverb.getSize()/4));
-    //reverb.setSize(reverb.getSize()+(map(headingVariance,0,60,0,1)-reverb.getSize()/4));
+    //averaging so you don't get as many reverb clicks
+    reverb.setSize(reverb.getSize()+(map(avgDiff_Position,0,500,0,1)-reverb.getSize()/4));
+    reverb.setDamping(1-map(avgDiff_Position,0,1000,0,1));
   }
   else{
     reverb.setSize(0);

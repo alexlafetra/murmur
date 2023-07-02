@@ -1,14 +1,3 @@
-
-//size of the bounding box
-float zDepth = -800;
-
-PVector orbitPoint = new PVector(400,400,-200);
-//size the boids are drawn at
-float boidSize = 10;
-//limit on forces
-float maxForce = 0.5;
-float maxSpeed = 10;
-
 class Boid{
   //data for position, vel, and acceleration
   PVector position;
@@ -25,23 +14,6 @@ class Boid{
     c = color(random(100,255),random(100,255),random(100,255));
 
   }
-  //this will probably get replaced with another steering function
-  //but for now, edges teleports boids to opposite end of screen when they leave it
-  void edges(){
-    if(position.x>width)
-      position.x = 0;
-    if(position.x<0)
-      position.x = width;
-    if(position.y>height)
-      position.y = 0;
-    if(position.y<0)
-      position.y = height;
-    if(position.z<zDepth)
-      position.z = 0;
-    if(position.z>-zDepth)
-      position.z = zDepth;
-  }
-  
   PVector randomForce(float mag){
     PVector randomF = new PVector(random(-1,1),random(-1,1),random(-1,1));
     randomF.setMag(mag);
@@ -75,11 +47,11 @@ class Boid{
     if(position.y<ceiling){
       floorF = new PVector(0,ceiling-position.y,0);
     }
-    else if(position.y>floor){
-      floorF = new PVector(0,floor-position.y,0);
+    else if(position.y>floorHeight){
+      floorF = new PVector(0,floorHeight-position.y,0);
     }
-    if(position.z<backWall){
-      frontF = new PVector(0,0,backWall-position.z);
+    if(position.z<zDepth){
+      frontF = new PVector(0,0,zDepth-position.z);
     }
     else if(position.z>frontWall){
       frontF = new PVector(0,0,frontWall-position.z);
@@ -104,8 +76,6 @@ class Boid{
     //velocity is incremented by acceleration
     velocity.add(acceleration);
     velocity.limit(maxSpeed);
-    //don't need to do edges now that the boids orbit the point
-    //edges();
   }
   
   PVector orbit(){
@@ -185,49 +155,48 @@ class Boid{
 
   //drawing the boid
   void render(String txt){
-    noStroke();
+    flockGraphics.noStroke();
     //color by c
     if(colorStyle == 0){
       //color a = color(map(acceleration.x,0,maxForce,0,255),map(acceleration.y,0,maxForce,0,255),map(acceleration.z,0,maxForce,0,255));
-      fill(c);
+      flockGraphics.fill(c);
     }
     //color by vel
     else if(colorStyle == 1){
       color a = color(map(velocity.x,-maxSpeed,maxSpeed,0,255),map(velocity.y,-maxSpeed,maxSpeed,0,255),map(velocity.z,0,maxSpeed,-maxSpeed,255));
-      fill(a);
+      flockGraphics.fill(a);
     }
     //color b/w
     else if(colorStyle == 2){
-      stroke(0);
-      strokeWeight(1);
-      fill(255);
+      flockGraphics.stroke(0);
+      flockGraphics.strokeWeight(1);
+      flockGraphics.fill(255);
     }
     //color by pos
     else if(colorStyle == 3){
       color a = color(map(position.x,0,width,0,255),map(position.y,0,height,0,255),map(position.z,0,zDepth,0,255));
-      fill(a);
+      flockGraphics.fill(a);
     }
-    pushMatrix();
-    translate(position.x,position.y,position.z);
+    flockGraphics.pushMatrix();
+    flockGraphics.translate(position.x,position.y,position.z);
     //debug numbers (not really useful for debugging, but it looks kinda cool
     if(colorStyle == 4){
-      fill(c);
-      text(txt,0,0);
+      flockGraphics.fill(c);
+      flockGraphics.text(txt,0,0);
     }
     //normal arrow
     else{
       PVector temp = new PVector(velocity.x,velocity.y,velocity.z);
       temp.mult(4);
-      beginShape(TRIANGLE_STRIP);
-      vertex(-boidSize/2,0,0);
-      vertex(boidSize/2,0,0);
-      vertex(temp.x,temp.y,temp.z);
-      vertex(0,0,boidSize*3);
-      vertex(-boidSize/2,0,0);
-      //emissive(300);
-      endShape();
+      flockGraphics.beginShape(TRIANGLE_STRIP);
+      flockGraphics.vertex(-boidSize/2,0,0);
+      flockGraphics.vertex(boidSize/2,0,0);
+      flockGraphics.vertex(temp.x,temp.y,temp.z);
+      flockGraphics.vertex(0,0,boidSize*3);
+      flockGraphics.vertex(-boidSize/2,0,0);
+      flockGraphics.endShape();
     }
-    popMatrix();
+    flockGraphics.popMatrix();
   }
 }
 void drawFloor(){
