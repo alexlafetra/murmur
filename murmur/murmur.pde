@@ -410,8 +410,8 @@ void draw(){
     */
   }
   //clear background
-  background(blackOrWhite_bg?0:255);
   flock();
+  background(blackOrWhite_bg?0:255);
   image(flockGraphics,0,0);
   updateOrbitPoint();
   if(!paused){

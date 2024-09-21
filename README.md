@@ -1,32 +1,32 @@
 <p align="center">
-  <img src="resources/images/murmur_logo_white.svg#gh-dark-mode-only">
-  <img src="resources/images/murmur_logo_black.svg#gh-light-mode-only">
+  <img src="readme/murmur_logo_white.svg#gh-dark-mode-only">
+  <img src="readme/murmur_logo_black.svg#gh-light-mode-only">
 </p>
  
- 
+<!--  
  <p align = "center">
   a soft, indistinct sound made by a person or group of people speaking quietly or at a distance.
- </p>
+ </p> -->
 
-# experimental granular synthesis with murmur
+# Experimental Granular Synthesis with Murmur
  
- Murmur is a digital instrument built around collective flocking behavior. It gets its name from "murmuration"-- a group of starlings flocking together, and from the concept of many voices speaking indistinctly.
+ Murmur is a digital instrument built around collective flocking behavior. It gets its name from "murmuration"-- a group of starlings flocking together, and from many voices speaking indistinctly.
 
- ![An image of murmur in-action](resources/images/img1_header.png)
+ ![An image of murmur in-action](readme/img1_header.png)
 
-The granular synthesizer Murmur runs is controlled by data gathered from the simulated community of "birds." Data like the average location, velocity, separation, and variation in direction of the birds are used to update the parameters of the granular synthesizer engine and play back samples.
+The granular synthesizer inside Murmur is controlled by data gathered from the simulated community of "birds." Data like the average location, velocity, separation, and variation in direction of the birds are used to update the parameters of the granular synthesizer engine and play back samples. The flocking simulation is based on Craig Reynold's original 1986 ["Boids"](https://www.red3d.com/cwr/boids/) algorithm (check out Reynold's website for more on the 'Boids' algorithm!), with tweakable parameters.
 
 # About
  
- Murmur is written in Java using [Processing](https://processing.org/). It uses the [Beads](http://www.beadsproject.net/) library to work with audio files and uses the inbuilt granular synthesizer. The logic behind the flocking sim is based on Craig Reynold's original 1986 ["Boids"](https://www.red3d.com/cwr/boids/) algorithm (check out Reynold's website for more on the 'Boids' algorithm!).
+ Murmur is a Java applet made using the [Processing](https://processing.org/) library and IDE, and the [Beads](http://www.beadsproject.net/) library for working with audio files and for the granular synthesis engine. This project is released under the MIT license.
  
  ## Running the Application
- The Window's .exe and OSX .app can both be downloaded [here](https://drive.google.com/drive/folders/1RTlT_pMIr7A4LObX3EDhMFMRy6rMbsHC?usp=share_link).
- The OSX app comes packaged with java, but to run the window's executable you'll need to download [OpenJDK](https://jdk.java.net/) *(I haven't actually tested this, at all. If you do, please let me know if it does/does not work!)*
+ The Window's .exe and OSX .app can both be downloaded from the releases page.
+ The OSX app comes packaged with java, but to run the window's executable you'll need to download [OpenJDK](https://jdk.java.net/).
  
  Unforunately, Murmur is a self-signed app and might not be trusted by your mac. [Here's](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac) Apple's how-to for opening unidentified software if your computer won't run it.
  
- To run murmur from within the [Processing IDE](https://processing.org/download) download the "murmur" folder and open any of the .pde files inside of it.  Once you've opened the sketch in the IDE, download the Beads library using Processing's library loader, and you should be able to run it as a normal processing sketch.
+ To run or edit murmur from within the [Processing IDE](https://processing.org/download) download the "murmur" folder and open any of the .pde files inside of it.  Once you've opened the sketch in the IDE, download the Beads library using Processing's library loader, and you should be able to run it as a normal processing sketch.
  
  ## Controls
  
@@ -42,7 +42,7 @@ The granular synthesizer Murmur runs is controlled by data gathered from the sim
  - distance from cursor --> noise
  - L/R velocity --> playback direction (fwd/rev)
 
- ![An image of murmur's controls](resources/images/img4.png)
+ ![An image of murmur's controls](readme/img4.png)
 
 On the right, the last orange and the round red button allow you to load and save recorded samples, respectively. Murmur currently can load in .mp3 and .wav files, and records to .wav files by default.
 
@@ -54,7 +54,7 @@ Buttons along the top of the screen control murmur's visual appearance. From lef
 - color each bird by its unique color, or by its velocity vector. Velocity by default, which *usually* helps visually highlight the subflocks within the group.
 - toggle between a black and white background, *_night mode baby_*.
  
- ![A Pretty Pic](resources/images/img2_header.png)
+ ![A Pretty Pic](readme/img2_header.png)
 
   # Quick Tips
  - Start with your system volume **low!** Use the slider in the lower right hand corner to adjust murmur's volume as it plays.
