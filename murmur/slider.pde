@@ -96,14 +96,12 @@ class Slider{
     if(type>=0){
       if(mouseX>(x-w/2) && mouseX<(x+w/2) && mouseY>(y-h/2) && mouseY<(y+h/2)){
         state = true;
-        cursor(HAND);
       }
     }
     //horizontal sliders
     else{
        if(mouseX>(x-h/2) && mouseX<(x+h/2) && mouseY>(y-w/2) && mouseY<(y+w/2)){
         state = true;
-        cursor(HAND);
       }
     }
     return state;

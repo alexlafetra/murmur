@@ -97,6 +97,7 @@ String website = "https://github.com/alexlafetra/murmur";
 PGraphics flockGraphics;
 
 color backgroundColor = color(0,0,0);
+color otherBackgroundColor = color(255,255,255);
 //---------------------------------
 
 //draws svg logo in top left corner
@@ -109,19 +110,13 @@ void drawLogo(){
   boolean highlight = false;
   if(isOverLogo()){
     highlight = true;
-    childWindow.text = "Info";
+    childWindow.text = "github";
   }
   if(blackOrWhite_bg){
-    if(highlight)
-      fill(250);
-    else
-      fill(100);
+    fill(255);
   }
   else{
-    if(highlight)
-      fill(50);
-    else
-      fill(200);
+    fill(0);
   }
   shape(logo,0,-buttonOffset);
   popMatrix();
@@ -393,7 +388,7 @@ void setup(){
   //init canvas
   size(1000,1000,P3D);
   background(0);
-  smooth(8);
+  //smooth(8);
 }
 
 void draw(){
@@ -435,6 +430,7 @@ void draw(){
   }
   else{
     displaySliders();
+    cursor(HAND);
   }
   drawLogo();
   

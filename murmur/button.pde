@@ -34,7 +34,6 @@ class Button{
   }
   Boolean isMousedOver(){
     if(mouseX>=x && mouseX<= x+w && mouseY>=y && mouseY<=y+h){
-      cursor(HAND);
       childWindow.text = txt;
       return true;
     }
@@ -293,6 +292,46 @@ boolean displayButtons(){
       atLeastOneButtonHovered = true;
     }
   }
+  textFont(garamond);
+  textSize(40);
+  fill(255);
+  stroke(255);
+  pushMatrix();
+  translate(40-buttonOffset,height-490);
+  text("flock",0,0);
+  popMatrix();
+  
+  pushMatrix();
+  translate(width-410,40-buttonOffset);
+  text("display",0,0);
+  popMatrix();
+  
+  pushMatrix();
+  translate(width-60+buttonOffset,360);
+  rotate(-PI/2);
+  text("audio",0,0);
+  popMatrix();
+  
+  pushMatrix();
+  translate(width-70+buttonOffset,730);
+  rotate(-PI/2);
+  textSize(30);
+  text("background",0,0);
+  popMatrix();
+  
+  pushMatrix();
+  translate(width-60+buttonOffset,height-100);
+  rotate(-PI/2);
+  textSize(30);
+  text("volume",0,0);
+  popMatrix();
+  
+  pushMatrix();
+  textSize(20);
+  text("'c' to clear screen",120,30-buttonOffset);
+  text("'click' or 'space' to pause sim",120,50-buttonOffset);
+  text("any key to hide controls",120,70-buttonOffset);
+  popMatrix();
   return atLeastOneButtonHovered;
 }
 boolean checkButtons(){
@@ -338,18 +377,15 @@ boolean checkButtons(){
   }
   if(bg.isMousedOver()){
     blackOrWhite_bg = !blackOrWhite_bg;
-    if(blackOrWhite_bg){
-      backgroundColor = color(0,0,0);
-      rSlider.currentVal = 255;
-      gSlider.currentVal = 255;
-      bSlider.currentVal = 255;
-    }
-    else{
-      backgroundColor = color(255,255,255);
-      rSlider.currentVal = 0;
-      gSlider.currentVal = 0;
-      bSlider.currentVal = 0;
-    }
+    
+    color temp = backgroundColor;
+    backgroundColor = otherBackgroundColor;
+    otherBackgroundColor = temp;
+    
+    rSlider.currentVal = 255 - red(backgroundColor);
+    gSlider.currentVal = 255 - green(backgroundColor);
+    bSlider.currentVal = 255 - blue(backgroundColor);
+    
     flockGraphics.beginDraw();
     flockGraphics.background(backgroundColor);
     flockGraphics.endDraw();
