@@ -31,7 +31,8 @@ class Slider{
   void randomize(){
     currentVal = random(min,max);
   }
-  void display(){
+  boolean display(){
+    boolean grabbed = isGrabbed();
     rectMode(CENTER);
     pushMatrix();
     //for right-set sliders
@@ -68,18 +69,15 @@ class Slider{
     pushMatrix();
     //get the relative height
     translate(0,map(currentVal,min,max,-h/2,h/2),1);
-    if(isGrabbed()){
+    if(grabbed){
       rect(0,0,w+5,(w+5)/2,10);
+      childWindow.text = txt;
     }
     else{
       rect(0,0,w,w/2,10);
     }
     popMatrix();
     textAlign(CENTER);
-    //drawing title text
-    if(isGrabbed()){
-      childWindow.text = txt;
-    }
     //if it's being moved, draw the current val
     if(isBeingMoved){
       if(textType == 1)
@@ -89,6 +87,7 @@ class Slider{
     }
     popMatrix();
     textAlign(LEFT);
+    return grabbed;
   }
   //checks if the slider is being grabbed
   boolean isGrabbed(){
@@ -210,10 +209,14 @@ void makeSliders(){
   sliders[10] = bSlider;
 
 }
-void displaySliders(){
+boolean displaySliders(){
+  boolean isOne = false;
   for(int i = 0; i<sliders.length; i++){
-    sliders[i].display();
+    if(sliders[i].display()){
+      isOne = true;
+    }
   }
+  return isOne;
 }
 boolean clickSliders(){
   boolean atLeastOne = false;

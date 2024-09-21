@@ -42,7 +42,8 @@ class Button{
       return false;
     }
   }
-  void display(){
+  boolean display(){
+    boolean hovered = isMousedOver();
     if(state){
       fill(c);
       stroke(c);
@@ -63,7 +64,7 @@ class Button{
         translate(x,y,0);
         strokeWeight(7);
         rectMode(CENTER);
-        if(isMousedOver()){
+        if(hovered){
           rect(w/2+buttonOffset,h/2,w+4,h+4,15);
         }
         else{
@@ -76,7 +77,7 @@ class Button{
         translate(x,y,0);
         strokeWeight(7);
         rectMode(CENTER);
-        if(isMousedOver()){
+        if(hovered){
           rect(w/2,h/2-buttonOffset,w+4,h+4,15);
         }
         else{
@@ -89,7 +90,7 @@ class Button{
         pushMatrix();
         translate(x,y,0);
         strokeWeight(7);
-        if(isMousedOver()){
+        if(hovered){
           ellipse(w/2+buttonOffset,h/2,w+4,h+4);
         }
         else{
@@ -102,7 +103,7 @@ class Button{
         pushMatrix();
         translate(x,y,0);
         strokeWeight(7);
-        if(isMousedOver()){
+        if(hovered){
           rect(w/2-buttonOffset,h/2,w+4,h+4,15);
         }
         else{
@@ -122,7 +123,7 @@ class Button{
           fill(0,0,0,0);
           noStroke();
         }
-        if(isMousedOver()){
+        if(hovered){
           ellipse(w/2+buttonOffset,h/2,w+4,h+4);
         }
         else{
@@ -140,7 +141,7 @@ class Button{
           pushMatrix();
           translate(x+w/2+buttonOffset,y+h/2,0);
           rectMode(CENTER);
-          if(isMousedOver()){
+          if(hovered){
             rotate(PI/4);
             rect(0,0,w+4,h/4+4,4);
             rotate(PI/2);
@@ -156,6 +157,7 @@ class Button{
         }
         break;
     }
+    return hovered;
   }
 }
 Button ptch;
@@ -284,10 +286,14 @@ void reset(){
   bSlider.currentVal = 255;
 }
 
-void displayButtons(){
+boolean displayButtons(){
+  boolean atLeastOneButtonHovered = false;
   for(int i = 0; i<buttons.length; i++){
-    buttons[i].display();
+    if(buttons[i].display()){
+      atLeastOneButtonHovered = true;
+    }
   }
+  return atLeastOneButtonHovered;
 }
 boolean checkButtons(){
   boolean atLeastOne = false;

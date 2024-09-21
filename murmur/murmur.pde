@@ -90,7 +90,7 @@ String filename = "demoSamples/demo1_chopin.mp3";
 //path to record into
 String outputPath = null;
 //link to website
-String website = "https://alexlafetra.github.io/projects/murmur/murmur.html";
+String website = "https://github.com/alexlafetra/murmur";
 
 //boids are drawn to the flock sim, which is then displayed behind the buttons/everything else
 //so that no frame refresh doesn't redraw the buttons
@@ -426,8 +426,16 @@ void draw(){
   stroke(255);  
   cursor(ARROW);
     
-  displayButtons();
-  displaySliders();
+  //if no buttons/sliders are hovered over
+  //remove the button text
+  if(!displayButtons()){
+    if(!displaySliders()){
+      childWindow.text = null;
+    }
+  }
+  else{
+    displaySliders();
+  }
   drawLogo();
   
   //if the controls are being shown
