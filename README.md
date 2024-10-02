@@ -30,10 +30,11 @@ The granular synthesizer inside Murmur is controlled by data gathered from the s
  
  ## Controls
  
- Clicking anywhere on the screen "freezes" the flock simulation, pressing any key shows/hides the button layout.
+ Clicking anywhere on the screen "freezes" the flock simulation, pressing 'c' clears the screen, and pressing any other key shows/hides the button layout.
  
  ### Audio engine
-  Clicking each button toggle's the corresponding connection between the sampler and the murmuration:
+  Toggling each audio button connects the corresponding flock data to the following granular synthesis parameter:
+
  - space between birds --> sample pitch
  - position --> L/R pan
  - speed --> grain rate
@@ -42,17 +43,17 @@ The granular synthesizer inside Murmur is controlled by data gathered from the s
  - distance from cursor --> noise
  - L/R velocity --> playback direction (fwd/rev)
 
- ![An image of murmur's controls](readme/img4.png)
+The last orange and the round red button allow you to load and save recorded samples, respectively. Murmur currently can load in .mp3 and .wav files, and records to .wav files by default.
 
-On the right, the last orange and the round red button allow you to load and save recorded samples, respectively. Murmur currently can load in .mp3 and .wav files, and records to .wav files by default.
+Murmur's second window displays button tooltips and a waveform of the current audio. Additionally, .mp3 and .wav audio files can be dropped onto the second window to load them into Murmur.
 
 ### Murmuration
 Buttons along the top of the screen control murmur's visual appearance. From left to right, these buttons let you:
-- freeze redrawing, giving each bird a trail.
+- freeze flock redrawing, letting you visualize the path of each bird over time
 - show the average position of the murmuration, colored by the average direction of all birds within it.
 - show the orbit radius around the cursor.
 - color each bird by its unique color, or by its velocity vector. Velocity by default, which *usually* helps visually highlight the subflocks within the group.
-- toggle between a black and white background, *_night mode baby_*.
+- toggle between different background colors
  
  ![A Pretty Pic](readme/img2_header.png)
 
