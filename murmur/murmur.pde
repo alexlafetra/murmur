@@ -12,68 +12,94 @@
 //drop library for file dropping
 import drop.*;
 
-//---------------------------------
-//parameters for the flock sim
-//---------------------------------
-//Vector holding the orbit point
-PVector orbitPoint = new PVector(400,400,-200);
+class FlockSettings{
+  //size the boids are drawn at
+  float boidSize = 10;
 
-//size the boids are drawn at
-float boidSize = 10;
+  //limit on forces
+  float maxForce = 0.5;
+  float maxSpeed = 10;
 
-//limit on forces
-float maxForce = 0.5;
-float maxSpeed = 10;
+  //number of birds
+  int numberOfBoids = 1000;
+  //avoidance weight
+  float avoidanceModifier = 1.5;
+  //attraction/cohesion weight
+  float cohesionModifier = 1.1;
+  //orientation/alignment weight
+  float orientationModifier = 1.2;
+  //random force weight
+  float randomModifier = 1;
+  //mouse cursor pull
+  float orbitModifier = 0.7;
+  //radius that bird is 'sensitive' to other birds
+  float perceptionRadius = 50;
+  //radius around the cursor that the birds are attracted to
+  float orbitRadius = 300;
 
-//number of birds
-int numberOfBoids = 1000;
-//avoidance weight
-float avoidanceModifier = 1.5;
-//attraction/cohesion weight
-float cohesionModifier = 1.1;
-//orientation/alignment weight
-float orientationModifier = 1.2;
-//random force weight
-float randomModifier = 1;
-//mouse cursor pull
-float orbitModifier = 0.7;
-//radius that bird is 'sensitive' to other birds
-float perceptionR = 50;
-//radius around the cursor that the birds are attracted to
-float orbitR = 300;
-//---------------------------------
-//wall dimensions
-//---------------------------------
-int rightWall = 1000;
-int leftWall = 0;
-float floorHeight = 800;
-int ceiling = 0;
-int frontWall = 50;
-int zDepth = -800;
-//---------------------------------
-//display controls
-//---------------------------------
-boolean paused = true;
-int colorStyle = 0;
-boolean showOrbitPoint = false;
-boolean showAvgPos = false;
-boolean blackOrWhite_bg = true;
-boolean showingControls = true;
-boolean updateScreen = true;
-boolean walls = false;
-//---------------------------------
-//granular synth controls
-//---------------------------------
-boolean stereo = true;
-boolean gRate = false;
-boolean pitch = true;
-boolean gSize = true;
-boolean gain = true;
-boolean gRandom = true;
-boolean reverse = true;
-boolean reverbing = false;
-boolean recStarted = false;
-boolean isMuted = false;
+  //---------------------------------
+  //wall dimensions
+  //---------------------------------
+  int rightWall = 1000;
+  int leftWall = 0;
+  float floorHeight = 800;
+  int ceiling = 0;
+  int frontWall = 50;
+  int zDepth = -800;
+  //---------------------------------
+  //display controls
+  //---------------------------------
+  boolean simulationPaused = true;
+  int colorStyle = 0;
+  boolean showOrbitPoint = false;
+  boolean showAvgPos = false;
+  boolean blackOrWhite_bg = true;
+  boolean showingControls = true;
+  boolean updateScreen = true;
+  boolean walls = false;
+  //---------------------------------
+  //granular synth controls
+  //---------------------------------
+  boolean stereo = true;
+  boolean gRate = false;
+  boolean pitch = true;
+  boolean gSize = true;
+  boolean gain = true;
+  boolean gRandom = true;
+  boolean reverse = true;
+  boolean reverbIsActive = false;
+  boolean recStarted = false;
+  boolean isMuted = false;
+  
+  FlockSettings(){}
+}
+
+FlockSettings settings;
+
+class Flock{
+  //array holding all the birds
+  Boid[] birds;
+  //Vector holding the orbit point
+  PVector orbitPoint;
+
+  Flock(int numberOfBirds){
+    //allocate memory for the flock
+    birds = new Boid[numberOfBirds];
+    orbitPoint = new PVector(400,400,-200);
+
+    //initialize the flock with boid objects
+    for(int i = 0; i<birds.length; i++){
+      birds[i] = new Boid();
+    }
+  }
+  void updateOrbitPoint(){
+    orbitPoint.x = mouseX;
+    orbitPoint.y = mouseY;
+  }
+}
+
+Flock flock;
+
 //---------------------------------
 //miscellaneous murmur variables
 //---------------------------------
@@ -83,8 +109,7 @@ boolean secondWindowOpen = false;
 //logo and font objects
 PShape logo;
 PFont garamond;
-//array that holds the birds
-Boid[] flock;
+
 //initial audio file name (from the demo folder)
 String filename = "demoSamples/demo1_chopin.mp3";
 //path to record into
@@ -112,7 +137,7 @@ void drawLogo(){
     highlight = true;
     childWindow.text = "github";
   }
-  if(blackOrWhite_bg){
+  if(settings.blackOrWhite_bg){
     fill(255);
   }
   else{
@@ -149,32 +174,53 @@ void drawPause(){
   rect(x+gap/2,y-h/2,w,h,10);
 }
 
-//updates the orbit point with mouse location
-void updateOrbitPoint(){
-  orbitPoint.x = mouseX;
-  orbitPoint.y = mouseY;
+void drawFloor(){
+  beginShape(QUADS);
+  vertex(0,settings.floorHeight,0);
+  vertex(width,settings.floorHeight,0);
+  vertex(width,settings.floorHeight,settings.zDepth);
+  vertex(0,settings.floorHeight,settings.zDepth);
+  endShape();
+}
+//draws bounds around the "edges" box
+void drawBounds(){
+  stroke(0);
+  strokeWeight(1);
+  beginShape(QUADS);
+  //front face
+  vertex(0,0,0);
+  vertex(width,0,0);
+  vertex(width,height,0);
+  vertex(0,height,0);
+  
+  //back face
+  vertex(0,0,settings.zDepth);
+  vertex(width,0,settings.zDepth);
+  vertex(width,height,settings.zDepth);
+  vertex(0,height,settings.zDepth);
+  endShape();
+  //edges
+  beginShape(LINES);
+  vertex(0,0,0);
+  vertex(0,0,settings.zDepth);
+  vertex(width,0,0);
+  vertex(width,0,settings.zDepth);
+  vertex(width,height,0);
+  vertex(width,height,settings.zDepth);
+  vertex(0,height,0);
+  vertex(0,height,settings.zDepth);
+  endShape();
+  
+  //middle plane
+  stroke(125,0,125);
+  beginShape(QUADS);
+  vertex(0,0,flock.orbitPoint.z);
+  vertex(width,0,flock.orbitPoint.z);
+  vertex(width,height,flock.orbitPoint.z);
+  vertex(0,height,flock.orbitPoint.z);
+  endShape();
 }
 
-//draws lines representing the sim walls
-void drawWalls(){
-  //stroke(blackOrWhite_bg ? 255:0);
-  //strokeWeight(3);
-  
-  //line(leftWall,ceiling,zDepth,rightWall,ceiling,zDepth);
-  //line(leftWall,floorHeight,zDepth,rightWall,floorHeight,zDepth);
-  //line(leftWall,ceiling,zDepth,leftWall,floorHeight,zDepth);
-  //line(rightWall,ceiling,zDepth,rightWall,floorHeight,zDepth);
-  
-  //line(leftWall,ceiling,frontWall,rightWall,ceiling,frontWall);
-  //line(leftWall,floorHeight,frontWall,rightWall,floorHeight,frontWall);
-  //line(leftWall,ceiling,frontWall,leftWall,floorHeight,frontWall);
-  //line(rightWall,ceiling,frontWall,rightWall,floorHeight,frontWall);
-  
-  //line(leftWall,ceiling,frontWall,leftWall,ceiling,zDepth);
-  //line(leftWall,floorHeight,frontWall,leftWall,floorHeight,zDepth);
-  //line(rightWall,ceiling,frontWall,rightWall,ceiling,zDepth);
-  //line(rightWall,floorHeight,frontWall,rightWall,floorHeight,zDepth);
-}
 
 //draws a sphere at the location of the average data
 void drawAvgData(){
@@ -186,27 +232,27 @@ void drawAvgData(){
   fill(b);
   noStroke();
   //drawing average location for debugging
-  if(showAvgPos){
+  if(settings.showAvgPos){
     pushMatrix();
     translate(avgPos.x,avgPos.y,avgPos.z);
     ellipse(0,0,100,100);
     popMatrix();
   }
   //drawing orbit point
-  if(showOrbitPoint){
+  if(settings.showOrbitPoint){
     fill(255);
     stroke(0);
     strokeWeight(1);
     pushMatrix();
-    translate(orbitPoint.x,orbitPoint.y,orbitPoint.z);
-    ellipse(0,0,orbitR,orbitR);
+    translate(flock.orbitPoint.x,flock.orbitPoint.y,flock.orbitPoint.z);
+    ellipse(0,0,settings.orbitRadius,settings.orbitRadius);
     popMatrix();
   }
 }
 
 //opens a file selection window so the user can select a new sample
 void getNewSample(){
-  paused = true;
+  settings.simulationPaused = true;
   player.kill();
   selectInput("feed me an mp3 file!", "loadFile");
 }
@@ -227,7 +273,7 @@ void loadFile(File selectedFile){
 
 //checks if the file is an mp3 or wav file
 boolean isValidAudioFileType(String s){
-  if(s.endsWith(".mp3")|s.endsWith(".wav")){
+  if(s.endsWith(".mp3")|s.endsWith(".wav")|s.endsWith(".m4a")){
     return true;
   }
   else{
@@ -264,7 +310,7 @@ PVector getLocationOnScreen(){
 void mousePressed(){
   boolean anyInteractions = false;
   //if controls are onscreen, let them be clicked
-  if(showingControls){
+  if(settings.showingControls){
     if(checkButtons())
       anyInteractions = true;
     if(clickSliders())
@@ -275,13 +321,13 @@ void mousePressed(){
     }
     //if there are no button presses/slider grabs, toggle pause
     if(!anyInteractions)
-      paused = !paused;
-    if(!paused)
+      settings.simulationPaused = !settings.simulationPaused;
+    if(!settings.simulationPaused)
       updateGrains();
   }
   //if not, just pause
   else{
-    paused = !paused;
+    settings.simulationPaused = !settings.simulationPaused;
   }
 }
 void mouseReleased(){
@@ -298,55 +344,56 @@ void keyPressed(){
   }
   //pause on space
   else if(key == ' '){
-    paused = !paused;
+    settings.simulationPaused = !settings.simulationPaused;
   }
   else if(key == 'r'){
     randomizeSliders();
   }
   else{
-    showingControls = !showingControls;
+    settings.showingControls = !settings.showingControls;
   }
 }
 //adds and subtracts boids as needed
 void checkBoidCount(){
-  int targetNumber = int(boidSlider.max-boidSlider.currentVal) - flock.length;
+  int targetNumber = int(boidSlider.max-boidSlider.currentVal) - flock.birds.length;
   //return if you don't need to add any boids
   if(targetNumber == 0)
     return;
   
-  Boid[] newFlock = new Boid[flock.length+targetNumber];
+  Flock newFlock = new Flock(flock.birds.length+targetNumber);
+
   //you need to remove targetNumber boids
   if(targetNumber<0){
-    for(int i = 0; i<newFlock.length; i++){
-      newFlock[i] = flock[i];
+    for(int i = 0; i<newFlock.birds.length; i++){
+      newFlock.birds[i] = flock.birds[i];
     }
   }
   //you need to add targetNumber boids
   else if(targetNumber>0){
-    for(int i = 0; i<newFlock.length;i++){
-      newFlock[i] = (i<flock.length)?flock[i]:(new Boid());
+    for(int i = 0; i<newFlock.birds.length;i++){
+      newFlock.birds[i] = (i<flock.birds.length)?flock.birds[i]:(new Boid());
     }
   }
   flock = newFlock;
 }
 
 //updates physics and renders each boid
-void flock(){
+void runSim(){
   flockGraphics.beginDraw();
-  if(updateScreen){
+  if(settings.updateScreen){
     flockGraphics.background(backgroundColor);
   }
-  for(int i = 0; i<flock.length; i++){
-    if(!paused){
+  for(int i = 0; i<flock.birds.length; i++){
+    if(!settings.simulationPaused){
       //updating physics of each boid
       avgDiff_Position = 0;
-      flock[i].updatePhysics(flock);
-      avgDiff_Position/=flock.length;
+      flock.birds[i].updatePhysics(flock.birds);
+      avgDiff_Position/=flock.birds.length;
       //updating location of each boid
-      flock[i].updateLocation();
+      flock.birds[i].updateLocation();
     }
     //drawing each boid
-    flock[i].render(str(i));
+    flock.birds[i].render(str(i));
   }
   flockGraphics.endDraw();
 }
@@ -365,13 +412,8 @@ void setup(){
   avgVel = new PVector(0,0,0);
   avgPos = new PVector(0,0,0);
   
-  //allocate memory for the flock
-  flock = new Boid[numberOfBoids];
-  
-  //initialize the flock with boid objects
-  for(int i = 0; i<flock.length; i++){
-    flock[i] = new Boid();
-  }
+  settings = new FlockSettings();
+  flock = new Flock(settings.numberOfBoids);
   
   //loading controls
   makeButtons();
@@ -392,10 +434,8 @@ void setup(){
 }
 
 void draw(){
+  //check to see if you need to open the second window
   if(!secondWindowOpen){
-    PVector loc = getLocationOnScreen();
-    childWindow = new ChildApplet(loc.x+1000,loc.y-53);
-    secondWindowOpen = true;
     //NEEDS to be initialized within draw!
     /*
     not sure why. running multiple PApplets with different renderers is really buggy,
@@ -403,13 +443,16 @@ void draw(){
     initializing the object here seems to force all the 'setup' for the main applet to take place first,
     THEN canvas() the second one
     */
+    PVector loc = getLocationOnScreen();
+    childWindow = new ChildApplet(loc.x+1000,loc.y-53);
+    secondWindowOpen = true;
   }
   //clear background
-  flock();
-  background(blackOrWhite_bg?0:255);
+  runSim();
+  background(settings.blackOrWhite_bg?0:255);
   image(flockGraphics,0,0);
-  updateOrbitPoint();
-  if(!paused){
+  flock.updateOrbitPoint();
+  if(!settings.simulationPaused){
     updateGrains();
   }
   else{
@@ -435,7 +478,7 @@ void draw(){
   drawLogo();
   
   //if the controls are being shown
-  if(showingControls){
+  if(settings.showingControls){
     moveSliders();
     if(buttonOffset>0){
       buttonOffset-=10;
@@ -446,6 +489,6 @@ void draw(){
       buttonOffset+=10;
     }
   }
-  if(walls)
-    drawWalls();
+  // if(settings.walls)
+  //   drawWalls();
 }

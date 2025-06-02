@@ -110,7 +110,7 @@ void startplayer() {
    reverbSize = new Glide(ac,0.1,0);
    
    reverb = new Reverb(ac,2);
-   reverb.pause(!settings.reverbIsActive);
+   reverb.pause(!settings.reverbing);
    
    //settings.gain that's controlled by flock
    g.setGain(gainGlide);
@@ -154,8 +154,8 @@ void getData(){
 }
 
 void toggleReverb(){
-  settings.reverbIsActive = !settings.reverbIsActive;
-  reverb.pause(!settings.reverbIsActive);
+  settings.reverbing = !settings.reverbing;
+  reverb.pause(!settings.reverbing);
 }
 
 void toggleMute(){
@@ -171,7 +171,7 @@ void toggleMute(){
 }
 
 void updateGrains(){
-  if(!settings.simulationPaused){
+  if(!settings.paused){
     getData();
   }
   float vel = avgVel.mag();
@@ -231,7 +231,7 @@ void updateGrains(){
   else{
     pan.setPos(0);
   }
-  if(settings.reverbIsActive){
+  if(settings.reverbing){
     //averaging so you don't get as many reverb clicks
     reverb.setSize(reverb.getSize()+(map(avgDiff_Position,0,500,0,1)-reverb.getSize()/4));
     reverb.setDamping(1-map(avgDiff_Position,0,1000,0,1));

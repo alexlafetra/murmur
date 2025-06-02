@@ -60,7 +60,7 @@ class Slider{
     }
     else{
       //println(brightness(backgroundColor));
-      c = blackOrWhite_bg ? color(255,255,255):color(0,0,0);
+      c = settings.blackOrWhite_bg ? color(255,255,255):color(0,0,0);
     }
     fill(c);
     //stick
@@ -124,14 +124,10 @@ Slider orientationSlider;
 Slider randomSlider;
 Slider orbitSlider;
 Slider perceptionSlider;
-
 Slider playbackSpeedSlider;
-
 Slider groupPositionToleranceSlider;
 Slider groupHeadingToleranceSlider;
-
 Slider boidSlider;
-
 Slider rSlider,gSlider,bSlider;
 
 Slider[] sliders;
@@ -154,7 +150,7 @@ void makeSliders(){
   bSlider.c2 = color(0,0,255);
   
   
-  boidSlider = new Slider(70,height-460,30,100,1,2000,2000-numberOfBoids,"Number of Boids",-1);
+  boidSlider = new Slider(70,height-460,30,100,1,2000,2000-settings.numberOfBoids,"Number of Boids",-1);
   boidSlider.colorByVal = true;
   boidSlider.c1 = color(0,200,200);
   boidSlider.c2 = color(255,200,255);
@@ -242,22 +238,22 @@ void moveSliders(){
   }
   
   //if it's not muted
-  if(!isMuted)
+  if(!settings.isMuted)
     masterGain.setGain(volumeSlider.max-volumeSlider.currentVal);
-  avoidanceModifier = avoidanceSlider.max-avoidanceSlider.currentVal;
-  cohesionModifier = cohesionSlider.max-cohesionSlider.currentVal;
-  orientationModifier = orientationSlider.max-orientationSlider.currentVal;
-  randomModifier = randomSlider.max-randomSlider.currentVal;
-  orbitR = orbitSlider.max - orbitSlider.currentVal;
-  perceptionR = perceptionSlider.max - perceptionSlider.currentVal;
+  settings.avoidanceModifier = avoidanceSlider.max-avoidanceSlider.currentVal;
+  settings.cohesionModifier = cohesionSlider.max-cohesionSlider.currentVal;
+  settings.orientationModifier = orientationSlider.max-orientationSlider.currentVal;
+  settings.randomModifier = randomSlider.max-randomSlider.currentVal;
+  settings.orbitRadius = orbitSlider.max - orbitSlider.currentVal;
+  settings.perceptionRadius = perceptionSlider.max - perceptionSlider.currentVal;
   
   checkBoidCount();
   backgroundColor = color(rSlider.max-rSlider.currentVal,gSlider.max-gSlider.currentVal,bSlider.max-bSlider.currentVal);
   if(red(backgroundColor)>180&&green(backgroundColor)>180&&blue(backgroundColor)>180){
-    blackOrWhite_bg = false;
+    settings.blackOrWhite_bg = false;
   }
   else{
-    blackOrWhite_bg = true;
+    settings.blackOrWhite_bg = true;
   }
 }
 
@@ -270,7 +266,9 @@ void releaseSliders(){
 void randomizeSliders(){
   //starting at 1 so you skip the volume slider, and end before the color sliders
   for(int i = 1; i<sliders.length-3; i++){
-    sliders[i].randomize();
+    //also skip the boid slider
+    if(i != 7)
+      sliders[i].randomize();
   }
   checkBoidCount();
 }

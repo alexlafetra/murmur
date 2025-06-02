@@ -132,8 +132,8 @@ class Button{
         break;
       //mute button
       case "MUTE":
-        if(!isMuted || (frameCount%60)>30){
-          if(!(blackOrWhite_bg) && !isMuted){
+        if(!settings.isMuted || (frameCount%60)>30){
+          if(!(settings.blackOrWhite_bg) && !settings.isMuted){
             fill(0);
             stroke(0);
           }
@@ -176,38 +176,33 @@ Button rec;
 Button tails;
 Button resetParams;
 Button randomizeParams;
-
 Button reverbButton;
-
 Button jumpToRandom;
-
 Button muteButton;
-
-
 Button[] buttons;
 
 void makeButtons(){
   reset = new Button(width-50,10,40,40, color(255,50,50), true, "Reset","RIGHT_SQUARE");
-  ptch = new Button(width-50,60,40,40, color(0,233,28), pitch, "Pitch","RIGHT_SQUARE");
-  streo = new Button(width-50,110,40,40, color(#FF5ACE), stereo, "Pan","RIGHT_SQUARE");
-  grnRate = new Button(width-50,160,40,40, color(150,150,200), gRate, "Grain Rate","RIGHT_SQUARE");
-  grnSize = new Button(width-50,210,40,40, color(#674DFF), gSize, "Grain Size","RIGHT_SQUARE");
-  vol = new Button(width-50,260,40,40, color(200,55,100), gain, "Gain","RIGHT_SQUARE");
-  rndm = new Button(width-50,310,40,40, color(255,200,200), gRandom, "Noise","RIGHT_SQUARE");
-  rev = new Button(width-50,360,40,40, color(200,100,255), paused, "Direction","RIGHT_SQUARE");
-  reverbButton = new Button(width-50,410,40,40, color(200,200,255), reverbing, "Reverb","RIGHT_SQUARE");
+  ptch = new Button(width-50,60,40,40, color(0,233,28), settings.pitch, "Pitch","RIGHT_SQUARE");
+  streo = new Button(width-50,110,40,40, color(#FF5ACE), settings.stereo, "Pan","RIGHT_SQUARE");
+  grnRate = new Button(width-50,160,40,40, color(150,150,200), settings.gRate, "Grain Rate","RIGHT_SQUARE");
+  grnSize = new Button(width-50,210,40,40, color(#674DFF), settings.gSize, "Grain Size","RIGHT_SQUARE");
+  vol = new Button(width-50,260,40,40, color(200,55,100), settings.gain, "Gain","RIGHT_SQUARE");
+  rndm = new Button(width-50,310,40,40, color(255,200,200), settings.gRandom, "Noise","RIGHT_SQUARE");
+  rev = new Button(width-50,360,40,40, color(200,100,255), settings.simulationPaused, "Direction","RIGHT_SQUARE");
+  reverbButton = new Button(width-50,410,40,40, color(200,200,255), settings.reverbIsActive, "Reverb","RIGHT_SQUARE");
   loadSample = new Button(width-50,460,40,40,color(255,150,50), true, "Load New Sample","RIGHT_SQUARE");
-  rec = new Button(width-50,560,40,40, color(222,22,29), paused, "Record","REC");
+  rec = new Button(width-50,560,40,40, color(222,22,29), settings.simulationPaused, "Record","REC");
   jumpToRandom = new Button(width-50,510,40,40,color(255,255,255), true, "Randomize Playhead","RIGHT_SQUARE");
   
   muteButton = new Button(width-50,height-50,40,40,color(255,255,255), true, "Mute","MUTE");
   
   //display controls
-  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), blackOrWhite_bg, "Swap Background","TOP_SQUARE");
+  bg = new Button(width-100,10,40,40,color(255,255,255), color(0,0,0), settings.blackOrWhite_bg, "Swap Background","TOP_SQUARE");
   byHeading = new Button(width-150,10,40,40,color(100,200,255), true, "Color Style","TOP_SQUARE");
-  showOrbit = new Button(width-200,10,40,40,color(200,200,255), walls, "Enable Walls","TOP_SQUARE");
-  showAvg = new Button(width-250,10,40,40,color(200,255,255), showAvgPos, "Show Average","TOP_SQUARE");
-  tails = new Button(width-300,10,40,40,color(255,220,0), updateScreen, "Toggle Screen Refresh","TOP_SQUARE");
+  showOrbit = new Button(width-200,10,40,40,color(200,200,255), settings.walls, "Enable Walls","TOP_SQUARE");
+  showAvg = new Button(width-250,10,40,40,color(200,255,255), settings.showAvgPos, "Show Average","TOP_SQUARE");
+  tails = new Button(width-300,10,40,40,color(255,220,0), settings.updateScreen, "Toggle Screen Refresh","TOP_SQUARE");
 
   //buttons for flock parameters
   resetParams = new Button(20,height-60,40,40, color(255,200,200), true, "Reset","LEFT_SQUARE");
@@ -247,7 +242,7 @@ void resetParameters(){
   randomSlider.currentVal = randomSlider.max-1;
   orbitSlider.currentVal = orbitSlider.max-300;
   perceptionSlider.currentVal = perceptionSlider.max-50;
-  boidSlider.currentVal = boidSlider.max-numberOfBoids;
+  boidSlider.currentVal = boidSlider.max-settings.numberOfBoids;
   checkBoidCount();
 }
 
@@ -262,14 +257,14 @@ void jumpToRandomLocation(){
 
 void reset(){
   player.kill();
-  paused = true;
+  settings.simulationPaused = true;
   avgVel = new PVector(0,0,0);
   avgPos = new PVector(0,0,0);
   //allocate memory for the flock
-  flock = new Boid[numberOfBoids];
+  flock = new Flock(settings.numberOfBoids);
   //initialize the flock with boid objects
-  for(int i = 0; i<flock.length; i++){
-    flock[i] = new Boid();
+  for(int i = 0; i<flock.birds.length; i++){
+    flock.birds[i] = new Boid();
   }
   makeButtons();
   //makeSliders();
@@ -337,38 +332,38 @@ boolean displayButtons(){
 boolean checkButtons(){
   boolean atLeastOne = false;
   if(ptch.isMousedOver()){
-    pitch = !pitch;
-    ptch.state = pitch;
+    settings.pitch = !settings.pitch;
+    ptch.state = settings.pitch;
     atLeastOne = true;
   }
   if(streo.isMousedOver()){
-    stereo = !stereo;
-    streo.state = stereo;
+    settings.stereo = !settings.stereo;
+    streo.state = settings.stereo;
     atLeastOne = true;
   }
   if(grnRate.isMousedOver()){
-    gRate = !gRate;
-    grnRate.state = gRate;
+    settings.gRate = !settings.gRate;
+    grnRate.state = settings.gRate;
     atLeastOne = true;
   }
   if(grnSize.isMousedOver()){
-    gSize = !gSize;
-    grnSize.state = gSize;
+    settings.gSize = !settings.gSize;
+    grnSize.state = settings.gSize;
     atLeastOne = true;
   }
   if(vol.isMousedOver()){
-    gain = !gain;
-    vol.state = gain;
+    settings.gain = !settings.gain;
+    vol.state = settings.gain;
     atLeastOne = true;
   }
   if(rndm.isMousedOver()){
-    gRandom = !gRandom;
-    rndm.state = gRandom;
+    settings.gRandom = !settings.gRandom;
+    rndm.state = settings.gRandom;
     atLeastOne = true;
   }
   if(rev.isMousedOver()){
-    reverse = !reverse;
-    rev.state = reverse;
+    settings.reverse = !settings.reverse;
+    rev.state = settings.reverse;
     atLeastOne = true;
   }
   if(reset.isMousedOver()){
@@ -376,7 +371,7 @@ boolean checkButtons(){
     atLeastOne = true;
   }
   if(bg.isMousedOver()){
-    blackOrWhite_bg = !blackOrWhite_bg;
+    settings.blackOrWhite_bg = !settings.blackOrWhite_bg;
     
     color temp = backgroundColor;
     backgroundColor = otherBackgroundColor;
@@ -389,23 +384,23 @@ boolean checkButtons(){
     flockGraphics.beginDraw();
     flockGraphics.background(backgroundColor);
     flockGraphics.endDraw();
-    bg.state = blackOrWhite_bg;
+    bg.state = settings.blackOrWhite_bg;
     atLeastOne = true;
   }
   if(byHeading.isMousedOver()){
-    colorStyle++;
-    colorStyle %= 5;
-    byHeading.c = color(255/5*colorStyle,200,200);
+    settings.colorStyle++;
+    settings.colorStyle %= 5;
+    byHeading.c = color(255/5*settings.colorStyle,200,200);
     atLeastOne = true;
   }
   if(showOrbit.isMousedOver()){
-    walls = !walls;
-    showOrbit.state = walls;
+    settings.walls = !settings.walls;
+    showOrbit.state = settings.walls;
     atLeastOne = true;
   }
   if(showAvg.isMousedOver()){
-    showAvgPos = !showAvgPos;
-    showAvg.state = showAvgPos;
+    settings.showAvgPos = !settings.showAvgPos;
+    showAvg.state = settings.showAvgPos;
     atLeastOne = true;
   }
   if(loadSample.isMousedOver()){
@@ -414,12 +409,12 @@ boolean checkButtons(){
     atLeastOne = true;
   }
   if(tails.isMousedOver()){
-    updateScreen = !updateScreen;
-    tails.state = updateScreen;
+    settings.updateScreen = !settings.updateScreen;
+    tails.state = settings.updateScreen;
     atLeastOne = true;
   }
   if(rec.isMousedOver()){
-    if(recStarted){
+    if(settings.recStarted){
       endRecording();
     }
     else{
@@ -442,7 +437,7 @@ boolean checkButtons(){
   }
   if(reverbButton.isMousedOver()){
     toggleReverb();
-    reverbButton.state = reverbing;
+    reverbButton.state = settings.reverbIsActive;
     atLeastOne = true;
   }
   if(jumpToRandom.isMousedOver()){
